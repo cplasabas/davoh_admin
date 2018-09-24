@@ -3,11 +3,11 @@ const range = (start, end) => new Array(end - start).fill(start).map((el, i) => 
 const shortMonth = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
-const monthVisitData = shortMonth.map(m => {
+const incomeExpense = shortMonth.map(m => {
   return {
     'month': m,
-    'Unique Visit': Math.floor(Math.random() * 1000) + 200,
-    'Page View': Math.floor(Math.random() * 1000) + 250,
+    'Income': Math.floor(Math.random() * 1000) + 200,
+    'Expense': Math.floor(Math.random() * 1000) + 250,
   };
 });
 
@@ -33,26 +33,26 @@ const campaignData = [
     name: 'Search'
   }
 ];
-const locationData = [
+const sellerData = [
   {
     value: 50,
-    name: 'China'
+    name: 'Agent 1'
   },
   {
     value: 35,
-    name: 'USA'
+    name: 'Agent 2'
   },
   {
     value: 25,
-    name: 'EU'
+    name: 'Agent 3'
   },
   {
     value: 10,
-    name: 'Russia'
+    name: 'Agent 4'
   },
   {
     value: 10,
-    name: 'Other'
+    name: 'other'
   }
 ];
 
@@ -73,9 +73,9 @@ const SinData = range(1, 12).map(i => {
 
 
 export {
-  monthVisitData,
+  incomeExpense,
   campaignData,
-  locationData,
+  sellerData,
   StackData,
   SinData,
 };

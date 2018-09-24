@@ -62,5 +62,24 @@ export default [
       this.$message.success(msg);
     }
   },
-
+  {
+    name: 'PRODUCT_ADDED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Product added successfully.'
+      };
+    }
+  },
+  {
+    name: 'PRODUCT_ADDED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'Product add fail.'
+      };
+    }
+  },
 ];

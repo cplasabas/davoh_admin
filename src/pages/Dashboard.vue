@@ -3,53 +3,44 @@
     <v-container grid-list-xl fluid>
       <v-layout row wrap>
         <!-- mini statistic start -->
-        <v-flex lg3 sm6 xs12>
+        <v-flex lg4 sm6 xs12>
           <mini-statistic
-            icon="fa fa-facebook"
-            title="100+"
-            sub-title="Likes"
-            color="indigo"      
+            icon="fa fa-usd"
+            title="1,000.00"
+            sub-title="income"
+            color="green"      
           >
           </mini-statistic>  
         </v-flex>
-        <v-flex lg3 sm6 xs12>
+        <v-flex lg4 sm6 xs12>
           <mini-statistic
-            icon="fa fa-google"
-            title="150+"
-            sub-title="Connections"
+            icon="fa fa-usd"
+            title="500.00"
+            sub-title="expense"
             color="red"      
           >
           </mini-statistic>           
         </v-flex>          
-        <v-flex lg3 sm6 xs12>
+        <v-flex lg4 sm6 xs12>
           <mini-statistic
-            icon="fa fa-twitter"
-            title="200+"
-            sub-title="Followers"
+            icon="fa fa-industry"
+            title="250.00"
+            sub-title="labor"
             color="light-blue"      
           >
           </mini-statistic>            
         </v-flex>        
-        <v-flex lg3 sm6 xs12>
-          <mini-statistic
-            icon="fa fa-instagram"
-            title="50+"
-            sub-title="Shots"
-            color="purple"      
-          >
-          </mini-statistic>             
-        </v-flex>   
         <!-- mini statistic  end -->   
         <v-flex lg8 sm12 xs12>
-          <v-widget title="Site Traffic" content-bg="white">
+          <v-widget title="Income/Expense" content-bg="white">
             <v-btn icon slot="widget-header-action">
               <v-icon class="text--secondary">refresh</v-icon>
             </v-btn>
             <div slot="widget-content">
                 <e-chart 
                 :path-option="[
-                  ['dataset.source', siteTrafficData],
-                  ['color', [color.lightBlue.base, color.green.lighten1]],
+                  ['dataset.source', incomeExpenseData],
+                  ['color', [color.green.base, color.red.base]],
                   ['legend.show', true],
                   ['xAxis.axisLabel.show', true],
                   ['yAxis.axisLabel.show', true],
@@ -71,11 +62,11 @@
           </v-widget>  
         </v-flex>
         <v-flex lg4 sm12 xs12>
-          <v-widget title="Top Location" content-bg="white">
+          <v-widget title="Top Sellers" content-bg="white">
             <div slot="widget-content">
                 <e-chart 
                 :path-option="[
-                  ['dataset.source', locationData],
+                  ['dataset.source', sellerData],
                   ['legend.bottom', '0'],
                   ['color', [color.lightBlue.base, color.indigo.base, color.pink.base, color.green.base, color.cyan.base, color.teal.base]],
                   ['xAxis.show', false],
@@ -91,36 +82,9 @@
             </div>
           </v-widget>  
         </v-flex>
-        <!-- social/weather card start -->
-        <v-flex lg4 sm12 xs12>
-          <profile-card>
-          </profile-card>
-        </v-flex>        
-        <v-flex lg4 sm12 xs12>
-          <box-chart
-            card-color="indigo"
-            title="Trending"
-            sub-title="10%"
-            icon="trending_up"
-            :data="siteTrafficData"
-            :chart-color="[color.indigo.lighten1]"
-            type="line"
-          >
-          </box-chart>
-          <box-chart class="mt-4"
-            card-color="pink"
-            title="Page views"
-            sub-title="10%"
-            icon="trending_up"
-            :data="siteTrafficData"
-            :chart-color="[color.pink.darken1, 'rgba(255,255,255,0.3)']"
-            gradient
-            type="area"
-          >
-          </box-chart>          
-        </v-flex>
+
         <!-- statistic section -->
-        <v-flex lg4 sm12 xs12>
+        <v-flex lg3 sm12 xs12>
           <linear-statistic 
             title="Sales"
             sub-title="Sales increase"
@@ -129,23 +93,29 @@
             :value="15"
           >
           </linear-statistic>
-          <linear-statistic class="my-4"
+        </v-flex>    
+        <v-flex lg3 sm12 xs12>
+          <linear-statistic
             title="Orders"
             sub-title="Increase"
             icon="trending_up"
             color="pink"
             :value="30"
           >
-          </linear-statistic>          
-          <linear-statistic class="my-4"
+          </linear-statistic>      
+        </v-flex>  
+        <v-flex lg3 sm12 xs12>
+          <linear-statistic
             title="Revenue"
             sub-title="Revenue increase"
             icon="trending_up"
             color="primary"
             :value="50"
           >
-          </linear-statistic>          
-          <linear-statistic class="mt-4"
+          </linear-statistic>     
+        </v-flex>  
+        <v-flex lg3 sm12 xs12>
+          <linear-statistic
             title="Cost"
             sub-title="Cost reduce"
             icon="trending_down"
@@ -153,46 +123,33 @@
             :value="25"
           >
           </linear-statistic>          
-        </v-flex>
-        <!-- Circle statistic -->
-        <v-flex lg4 sm12 xs12 v-for="(item,index) in trending" :key="'c-trending'+index">
-          <circle-statistic
-            :title="item.subheading"
-            :sub-title="item.headline"
-            :caption="item.caption"
-            :icon="item.icon.label"
-            :color="item.linear.color"
-            :value="item.linear.value"
+        </v-flex>  
+
+        <v-flex lg6 sm12 xs12>
+           <box-chart
+            card-color="green"
+            title="Income"
+            sub-title="10%"
+            icon="trending_up"
+            :data="incomeExpenseData"
+            :chart-color="[color.green.lighten1]"
+            type="line"
           >
-          </circle-statistic>            
-        </v-flex>    
-        <!-- acitivity/chat widget -->
-        <v-flex lg6 sm12 xs12>
-          <chat-window height="308px"></chat-window>
+          </box-chart>
         </v-flex>
         <v-flex lg6 sm12 xs12>
-          <v-widget title="Activities" contentBg="white">
-            <div slot="widget-content">
-              <ol class="timeline timeline-activity timeline-point-sm timeline-content-right">
-                <li class="timeline-block" v-for="(item, index) in activity" :key="index">
-                  <div class="timeline-point">
-                    <v-circle dot large :color="item.color"></v-circle>
-                  </div>
-                  <div class="timeline-content">
-                    <time datetime="2018" class="subheading">{{item.timeString}}</time>
-                    <div class="py-2 text--secondary" v-html="item.text"></div>
-                  </div>
-                </li>
-              </ol>              
-            </div>
-          </v-widget>          
+          <box-chart
+            card-color="pink"
+            title="Expense"
+            sub-title="10%"
+            icon="trending_up"
+            :data="incomeExpenseData"
+            :chart-color="[color.pink.darken1, 'rgba(255,255,255,0.3)']"
+            gradient
+            type="area"
+          >
+          </box-chart>          
         </v-flex>
-        <v-flex lg7 sm12 xs12>
-          <plain-table></plain-table>
-        </v-flex>
-        <v-flex lg5 sm12 xs12>
-          <plain-table-order></plain-table-order>
-        </v-flex>               
       </v-layout>
     </v-container>
   </div>
@@ -331,11 +288,11 @@ export default {
     posts () {
       return API.getPost(3);
     },
-    siteTrafficData () {
-      return API.getMonthVisit;
+    incomeExpenseData () {
+      return API.getIncomeExpense;
     },
-    locationData () {
-      return API.getLocation;
+    sellerData () {
+      return API.getSellerData;
     }
   },
 

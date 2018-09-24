@@ -354,9 +354,9 @@ import EChart from '@/components/chart/echart';
 import {
   StackData,
   SinData,
-  monthVisitData,
+  incomeExpense,
   campaignData,
-  locationData,
+  sellerData,
 } from '@/api/chart';
 import Material from 'vuetify/es5/util/colors';
 import MiniChart from '@/components/widgets/chart/MiniChart';
@@ -375,9 +375,9 @@ export default {
       option: null,
       dataset: {
         sinData: SinData,
-        monthVisit: monthVisitData,
+        monthVisit: incomeExpense,
         campaign: campaignData,
-        location: locationData,
+        location: sellerData,
         stackData: StackData,
       },
       color: Material,

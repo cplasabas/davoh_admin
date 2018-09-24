@@ -1,11 +1,12 @@
 import Vue from 'vue';
 import App from './App';
 import Vuetify from 'vuetify';
+import moment from 'vue-moment';
+import VueCurrencyFilter from 'vue-currency-filter';
 import router from './router';
 import 'font-awesome/css/font-awesome.css';  
 import './theme/default.styl';
 import VeeValidate from 'vee-validate';
-import colors from 'vuetify/es5/util/colors';
 import Truncate from 'lodash.truncate';
 Vue.config.productionTip = false;
 import store from '@/store/store';
@@ -14,11 +15,23 @@ import store from '@/store/store';
 // Global filters
 Vue.filter('truncate', Truncate);
 Vue.use(VeeValidate, { fieldsBagName: 'formFields' });
+Vue.use(moment);
+
+Vue.use(VueCurrencyFilter,
+  {
+    symbol: '$',
+    thousandsSeparator: ',',
+    fractionCount: 2,
+    fractionSeparator: '.',
+    symbolPosition: 'front',
+    symbolSpacing: true
+  });
+
 Vue.use(Vuetify, {
   theme: {
-    primary: colors.yellow.darken3, // #E53935
-    secondary: colors.grey.darken3, // #FFCDD2
-    accent: colors.yellow.darken3 // #3F51B5
+    primary: '#e4b23a',
+    secondary: '#2d2d2d', // #FFCDD2
+    accent: '#e4b23a' // #3F51B5
   },
   options: {
     themeVariations: ['primary', 'secondary', 'accent'],

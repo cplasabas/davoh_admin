@@ -1,25 +1,24 @@
 <template>
-  <v-app class="primary">
-    <v-content>
+  <v-app id="login">
+    <v-content >
       <v-container fluid fill-height>
         <v-layout align-center justify-center>
           <v-flex xs12 sm8 md4 lg4>
             <v-card class="elevation-1 pa-3">
               <v-card-text>
                 <div class="layout column align-center">
-                  <!-- <img src="/static/m.png" alt="Vue Material Admin" width="120" height="120"> -->
-                  <h1 class="flex my-4 secondary--text">DAVOH</h1>
+                  <img src="/static/img/logo_text.png" alt="davoh" width="240" height="240">
                 </div>
                 <v-alert v-show="error" type="error" :value="true">
                   {{ error }}
                 </v-alert>                
                 <v-form>
-                  <v-text-field append-icon="person" name="login" label="Login" type="text" v-model="username"></v-text-field>
-                  <v-text-field append-icon="lock" name="password" label="Password" id="password" type="password" v-model="password"></v-text-field>
+                  <v-text-field prepend-icon="person" name="login" label="Login" type="text" v-model="username"></v-text-field>
+                  <v-text-field prepend-icon="lock" name="password" label="Password" id="password" type="password" v-model="password"></v-text-field>
                 </v-form>
               </v-card-text>
               <v-card-actions>
-                <v-btn block color="primary" @click="login" :loading="loading">Login</v-btn>
+                <v-btn block color="primary" @click="login" @keyup.enter="login" :loading="loading">Login</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
@@ -62,3 +61,11 @@ export default {
 
 };
 </script>
+
+<style scoped lang="css">
+  #login {
+    background-color: #fcf1dd;
+    background-image: url("~/static/img/backdrop-single.png");
+    background-size: 30px;  
+  }
+</style>

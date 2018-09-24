@@ -11,6 +11,18 @@ const Menu =  [
     icon: 'storage',
     name: 'Products',
   },
+  {
+    title: 'Categories',
+    group: 'default',
+    icon: 'layers',
+    name: 'Categories',
+  },
+  {
+    title: 'Manufacturers',
+    group: 'default',
+    icon: 'store_mall_directory',
+    name: 'Manufacturers',
+  },
   // {
   //   title: 'Chat',
   //   group: 'apps',

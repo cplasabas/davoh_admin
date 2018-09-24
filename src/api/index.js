@@ -31,8 +31,8 @@ export default {
   getMailById: Mail.getMailById,
   getMailByType: Mail.getMailByType,
   // chart data
-  getMonthVisit: Chart.monthVisitData,
+  getIncomeExpense: Chart.incomeExpense,
   getCampaign: Chart.campaignData,
-  getLocation: Chart.locationData,
+  getSellerData: Chart.sellerData,
 
 };

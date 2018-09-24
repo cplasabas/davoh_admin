@@ -77,6 +77,26 @@ export default [
       `@/pages/Products.vue`
     )
   },
+  {
+    path: '/manufacturers',
+    meta: { breadcrumb: true },
+    name: 'Manufacturers',
+    component: () => import(
+      /* webpackChunkName: "routes" */
+      /* webpackMode: "lazy-once" */
+      `@/pages/Manufacturers.vue`
+    )
+  },
+  {
+    path: '/Categories',
+    meta: { breadcrumb: true },
+    name: 'Categories',
+    component: () => import(
+      /* webpackChunkName: "routes" */
+      /* webpackMode: "lazy-once" */
+      `@/pages/Categories.vue`
+    )
+  },
 
   // {
   //   path: '/calendar',
