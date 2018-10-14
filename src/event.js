@@ -82,4 +82,24 @@ export default [
       };
     }
   },
+  {
+    name: 'PRODUCT_DELETED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Product delete successfully.'
+      };
+    }
+  },
+  {
+    name: 'PRODUCT_DELETED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'Product delete fail.'
+      };
+    }
+  }
 ];

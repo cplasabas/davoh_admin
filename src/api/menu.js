@@ -16,13 +16,7 @@ const Menu =  [
     group: 'default',
     icon: 'layers',
     name: 'Categories',
-  },
-  {
-    title: 'Manufacturers',
-    group: 'default',
-    icon: 'store_mall_directory',
-    name: 'Manufacturers',
-  },
+  }
   // {
   //   title: 'Chat',
   //   group: 'apps',

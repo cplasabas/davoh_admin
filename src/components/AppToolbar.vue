@@ -48,6 +48,8 @@
 <script>
 import NotificationList from '@/components/widgets/list/NotificationList';
 import Util from '@/util';
+import store from '@/store/store';
+
 export default {
   name: 'app-toolbar',
   components: {
@@ -60,6 +62,7 @@ export default {
         href: '#',
         title: 'Logout',
         click: (e) => {
+          store.dispatch('setToken', null);
           window.getApp.$emit('APP_LOGOUT');
         }
       }

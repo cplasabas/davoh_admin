@@ -50,6 +50,7 @@ export default {
           this.loading = false;
           this.$router.push('/dashboard');
           this.$store.dispatch('setToken', response.data.token);
+          this.$store.dispatch('setUser', response.data.data);
           window.getApp.$emit('APP_LOGIN_SUCCESS');
         });
       } catch (error) { 

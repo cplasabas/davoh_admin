@@ -59,7 +59,7 @@ export default [
   },
   {
     path: '/dashboard',
-    meta: { breadcrumb: true },
+    meta: { breadcrumb: true, requiresAuth: true },
     name: 'Dashboard',
     component: () => import(
       /* webpackChunkName: "routes" */
@@ -69,7 +69,7 @@ export default [
   },
   {
     path: '/products',
-    meta: { breadcrumb: true },
+    meta: { breadcrumb: true, requiresAuth: true },
     name: 'Products',
     component: () => import(
       /* webpackChunkName: "routes" */
@@ -78,18 +78,18 @@ export default [
     )
   },
   {
-    path: '/manufacturers',
-    meta: { breadcrumb: true },
-    name: 'Manufacturers',
+    path: '/products/:product_id',
+    meta: { breadcrumb: true, requiresAuth: true },
+    name: 'Products View',
     component: () => import(
       /* webpackChunkName: "routes" */
       /* webpackMode: "lazy-once" */
-      `@/pages/Manufacturers.vue`
+      `@/pages/Product_View.vue`
     )
   },
   {
     path: '/Categories',
-    meta: { breadcrumb: true },
+    meta: { breadcrumb: true, requiresAuth: true },
     name: 'Categories',
     component: () => import(
       /* webpackChunkName: "routes" */
