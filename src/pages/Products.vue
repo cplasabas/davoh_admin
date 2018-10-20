@@ -135,12 +135,12 @@
                   </td>
                   <td>{{ props.item.code }}</td>
                   <td>{{ props.item.category.name }}</td>
-                  <td>{{ props.item.labor | currency }}</td>
+                  <!-- <td>{{ props.item.labor | currency }}</td> -->
                   <td>{{ props.item.manufacture_cost | currency }}</td>
-                  <td>{{ props.item.manufacture_date | moment("MMMM Do YYYY") }}</td>
+                  <!-- <td>{{ props.item.manufacture_date | moment("MMMM Do YYYY") }}</td> -->
                   <td>{{ props.item.price | currency }}</td>
                   <td>{{ props.item.product_status.status}}</td>
-                  <td>
+                  <td class="text-xs-center">
                     <v-btn @click="view_product(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>remove_red_eye</v-icon>
                     </v-btn>
@@ -249,18 +249,18 @@ export default {
             text: 'Category',
             value: 'category'
           },
-          {
-            text: 'Labor',
-            value: 'labor'
-          },
+          // {
+          //   text: 'Labor',
+          //   value: 'labor'
+          // },
           {
             text: 'Manufacture Cost',
             value: 'manufacture_cost'
           },
-          {
-            text: 'Manufacture Date',
-            value: 'manufacture_date'
-          },
+          // {
+          //   text: 'Manufacture Date',
+          //   value: 'manufacture_date'
+          // },
           {
             text: 'Price',
             value: 'price'

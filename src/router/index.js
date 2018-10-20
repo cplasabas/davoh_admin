@@ -19,37 +19,19 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth) {
     if (!store.state.isUserLogged) {
-      store.watch((state, getters) => getters.getLogged, (isUserLogged) => {
-        if (isUserLogged) {
-          next();
-        }
-        else {
-          next({
-            name: 'Root'
-          });
-        }
+      next({
+        path: '/'
       });
-    } else if (store.state.isUserLogged) {
-      next();
+      NProgress.done();
     } else {
-      next({
-        name: 'Root'
-      });
+      next();
     } 
-  } else if (to.meta.requiresAdmin) {
-    if (!this.$store.state.isUserLogged) {
-      next({
-        name: 'Root'
-      });
-    }
   } else {
     next();
   }
-  
 });
 
 router.afterEach((to, from) => {
-
   NProgress.done();
 });
 

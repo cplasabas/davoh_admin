@@ -72,8 +72,11 @@
   </v-navigation-drawer>
 </template>
 <script>
-import menu from '@/api/menu';
+import adminMenu from '@/api/adminMenu';
+import nonAdminMenu from '@/api/nonAdminMenu';
+import store from '@/store/store';
 import VuePerfectScrollbar from 'vue-perfect-scrollbar';
+
 export default {
   name: 'app-drawer',
   components: {
@@ -88,7 +91,7 @@ export default {
   data: () => ({
     mini: false,
     drawer: true,
-    menus: menu,
+    menus: nonAdminMenu,
     scrollSettings: {
       maxScrollbarLength: 160
     }    
@@ -106,11 +109,16 @@ export default {
     }    
   },
   created () {
+    if (store.state.user.level === 0) {
+      this.menus = adminMenu;
+    } else {
+      this.menus = nonAdminMenu;
+    }
+
     window.getApp.$on('APP_DRAWER_TOGGLED', () => {
       this.drawer = (!this.drawer);
     });
   },
-  
 
   methods: {
     genChildTarget (item, subItem) {

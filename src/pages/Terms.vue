@@ -10,18 +10,25 @@
               </v-btn>
               <v-card>
                 <v-card-title>
-                  <span class="headline">New Category</span>
+                  <span class="headline" v-if="is_edit">Edit Term</span>
+                  <span class="headline" v-else>New Term</span>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
                   <v-container grid-list-md>
                     <v-layout wrap>
                       <v-flex xs12 sm12 md12>
-                        <v-text-field v-model="category.name" label="Category Name" hint="Name of the category" required></v-text-field>
+                        <v-text-field v-model="term.name" label="Name" hint="Name" required></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm12 md12>
-                        <v-textarea v-model="category.description" label="Description" hint="Description of the category"
+                        <v-textarea v-model="term.description" label="Description" hint="Description"
                         ></v-textarea>
+                      </v-flex>
+                      <v-flex xs6 sm6 lg6>
+                        <v-text-field v-model="term.month" label="Month" value="0"></v-text-field>
+                      </v-flex>
+                      <v-flex xs6 sm6 lg6>
+                        <v-text-field v-model="term.year" label="Year" value="0"></v-text-field>
                       </v-flex>
                     </v-layout>
                   </v-container>
@@ -30,7 +37,8 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                  <v-btn color="primary" flat @click="add_category()">Add</v-btn>
+                  <v-btn color="primary" v-if="is_edit" flat @click="edit_term()">EDIT</v-btn>
+                  <v-btn color="primary" v-else flat @click="add_term()">Add</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -56,14 +64,15 @@
             <v-divider></v-divider>
             <v-card-text class="pa-0">
               <v-data-table
-                :headers="categories.headers"
+                :headers="terms.headers"
                 :search="search"
-                :items="categories.items"
+                :items="terms.items"
                 :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
                 class="elevation-1"
                 item-key="name"
                 select-all
-                v-model="categories.selected"
+                v-model="terms.selected"
+                
                 >
                 <template slot="items" slot-scope="props">
                 <td>
@@ -74,11 +83,16 @@
                   ></v-checkbox>
                 </td>              
                   <td>{{ props.item.name }}</td>
-                  <td>{{ props.item.description }}</td>
+                  <td>{{ props.item.description}}</td>
+                  <td>{{ props.item.month }}</td>
+                  <td>{{ props.item.year }}</td>
                   <td>
-                  <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
-                    <v-icon>delete</v-icon>
-                  </v-btn>
+                    <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
+                      <v-icon>create</v-icon>
+                    </v-btn>
+                    <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
+                      <v-icon>delete</v-icon>
+                    </v-btn>
                   </td>
                 </template>
               </v-data-table>
@@ -87,17 +101,17 @@
           <v-dialog v-model="dialog.show_delete" scrollable @keydown.esc="dialog.show_delete = false" persistent max-width="700px">
             <v-card>
               <v-card-title>
-                <span class="headline">Delete Category</span>
+                <span class="headline">Delete Term</span>
               </v-card-title>
               <v-divider></v-divider>
               <v-card-text>
                 <v-container grid-list-md>
-                  <p>Are you sure you want to delete the category?</p>
+                  <p>Are you sure you want to delete the term?</p>
                 </v-container>
                 <div class="text-xs-center">
                   <div class="v-dialog__container" inset="true" style="display: inline-block;">
                     <div class="v-dialog__activator">
-                      <button type="button" @click="delete_category()" class="v-btn theme--dark red">
+                      <button type="button" @click="delete_term()" class="v-btn theme--dark red">
                         <div class="v-btn__content">Delete</div>
                       </button>
                     </div>
@@ -111,7 +125,6 @@
             </v-card>
           </v-dialog>
         </v-flex>  
-
       </v-layout>
     </v-container>
   </div>
@@ -124,7 +137,7 @@ export default {
   data () {
     return {
       search: '',
-      categories: {
+      terms: {
         selected: [],
         headers: [
           {
@@ -136,9 +149,18 @@ export default {
             value: 'description'
           },
           {
-            text: 'Actions',
-            value: 'actions'
+            text: 'Month',
+            value: 'month'
           },
+          {
+            text: 'Year',
+            value: 'year'
+          },
+          {
+            text: 'Actions',
+            value: 'actions',
+            align: 'center'
+          }
         ],
         items: []
       },
@@ -146,66 +168,77 @@ export default {
         show_add: false,
         show_delete: false
       },
-      category: {
+      term: {
         name: '',
-        description: ''
+        description: '',
+        month: 0,
+        year: 0
       },
+      is_edit: false,
       delete_id: null
     };
   },
   methods: {
-    view_delete (product_id) {
-      this.delete_id = product_id;
+    view_delete (id) {
+      this.delete_id = id;
       this.dialog.show_delete = true;
     },
-    async delete_category () {
+    async delete_term () {
 
       try {
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        await Api().delete('category/' + this.delete_id, config).then(response => {
+        await Api().delete('term/' + this.delete_id, config).then(response => {
           this.dialog.show_delete = false;
-          this.get_categories();
-          window.getApp.$emit('CATEGORY_DELETED_SUCCESS');
+          this.get_terms();
+          window.getApp.$emit('TERM_DELETED_SUCCESS');
         });
       } catch (error) { 
         this.dialog.show_delete = false;
-        window.getApp.$emit('CATEGORY_DELETED_FAIL');
+        window.getApp.$emit('TERM_DELETED_FAIL');
       }
 
     },
-    get_categories () {
+    view_edit (id) {
+      this.show_add = true;
+      this.is_edit = true;
+      // $$.each(this.terms.items[id], function(key, value) {
+      //   this.term[key] = value
+      // });
+    },
+    get_terms () {
       let config = {
         headers: { 'Authorization': this.$store.state.token }
       };
 
-      Api().get('category', config).then(response => {
-        this.categories.items = response.data.categories;
+      Api().get('term', config).then(response => {
+        this.terms.items = response.data.terms;
       });
     },
-    async add_category () { 
+    async add_term () { 
 
       try {
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        await Api().post('category', this.category, config).then(response => {
+        await Api().post('term', this.term, config).then(response => {
           this.dialog.show_add = false;
-          this.get_categories();
-          window.getApp.$emit('CATEGORY_ADDED_SUCCESS');
+          this.get_terms();
+          window.getApp.$emit('Term_ADDED_SUCCESS');
         });
       } catch (error) { 
         this.dialog.show_add = false;
-        window.getApp.$emit('CATEGORY_ADDED_FAIL');
+        window.getApp.$emit('Term_ADDED_FAIL');
       }
     }
   },
   // eslint-disable-next-line
   created: function () {
-    this.get_categories();
+
+    this.get_terms();
   },
 };
 </script>

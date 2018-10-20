@@ -21,17 +21,21 @@
 </template>
 
 <script>
-import menu from '@/api/menu';
+import adminMenu from '@/api/adminMenu';
+import nonAdminMenu from '@/api/nonAdminMenu';
+import store from '@/store/store';
+
 export default {
   data () {
     return {
-      title: ''
+      title: '',
+      menus: nonAdminMenu
     };
   },
   computed: {
     breadcrumbs: function () {
       let breadcrumbs = [];
-      menu.forEach(item => {
+      this.menus.forEach(item => {
         if (item.items) {
           let child =  item.items.find(i => {
             return i.component === this.$route.name;
@@ -50,6 +54,13 @@ export default {
       });
       return breadcrumbs;
     },    
-  }
+  },
+  created () {
+    if (store.state.user.level === 0) {
+      this.menus = adminMenu;
+    } else {
+      this.menus = nonAdminMenu;
+    }
+  },
 };
 </script>

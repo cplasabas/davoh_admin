@@ -3,24 +3,24 @@
     <v-container grid-list-xl fluid>
       <v-layout row wrap justify-end>
         <v-flex lg2 >
-            <v-dialog v-model="dialog.show_add" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
+            <v-dialog v-model="dialog.show_add" v-show="isAdmin" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
               <v-btn color="primary" dark slot="activator">
                 <v-icon >add</v-icon>
                 add
               </v-btn>
               <v-card>
                 <v-card-title>
-                  <span class="headline">New Category</span>
+                  <span class="headline">New User</span>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
                   <v-container grid-list-md>
                     <v-layout wrap>
                       <v-flex xs12 sm12 md12>
-                        <v-text-field v-model="category.name" label="Category Name" hint="Name of the category" required></v-text-field>
+                        <v-text-field v-model="user.first_name" label="First Name" hint="First Name" required></v-text-field>
                       </v-flex>
                       <v-flex xs12 sm12 md12>
-                        <v-textarea v-model="category.description" label="Description" hint="Description of the category"
+                        <v-textarea v-model="user.last_name" label="Last Name" hint="Last Name"
                         ></v-textarea>
                       </v-flex>
                     </v-layout>
@@ -30,7 +30,7 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                  <v-btn color="primary" flat @click="add_category()">Add</v-btn>
+                  <v-btn color="primary" flat @click="add_user()">Add</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -56,14 +56,15 @@
             <v-divider></v-divider>
             <v-card-text class="pa-0">
               <v-data-table
-                :headers="categories.headers"
+                :headers="users.userHeaders"
                 :search="search"
-                :items="categories.items"
+                :items="users.items"
                 :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
                 class="elevation-1"
                 item-key="name"
                 select-all
-                v-model="categories.selected"
+                v-model="users.selected"
+                
                 >
                 <template slot="items" slot-scope="props">
                 <td>
@@ -73,12 +74,22 @@
                     v-model="props.selected"
                   ></v-checkbox>
                 </td>              
-                  <td>{{ props.item.name }}</td>
-                  <td>{{ props.item.description }}</td>
                   <td>
-                  <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
-                    <v-icon>delete</v-icon>
-                  </v-btn>
+                    <v-avatar size="32">
+                      <img :src="props.item.image" alt="">
+                    </v-avatar> 
+                  </td>
+                  <td>{{ props.item.first_name }}</td>
+                  <td>{{ props.item.last_name}}</td>
+                  <td>{{ props.item.email }}</td>
+                  <td>{{ props.item.contact }}</td>
+                  <td>
+                    <v-btn @click="view_product(props.item.id)" depressed outline icon fab dark color="green" small>
+                      <v-icon>remove_red_eye</v-icon>
+                    </v-btn>
+                    <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
+                      <v-icon>delete</v-icon>
+                    </v-btn>
                   </td>
                 </template>
               </v-data-table>
@@ -87,17 +98,17 @@
           <v-dialog v-model="dialog.show_delete" scrollable @keydown.esc="dialog.show_delete = false" persistent max-width="700px">
             <v-card>
               <v-card-title>
-                <span class="headline">Delete Category</span>
+                <span class="headline">Delete User</span>
               </v-card-title>
               <v-divider></v-divider>
               <v-card-text>
                 <v-container grid-list-md>
-                  <p>Are you sure you want to delete the category?</p>
+                  <p>Are you sure you want to delete the user?</p>
                 </v-container>
                 <div class="text-xs-center">
                   <div class="v-dialog__container" inset="true" style="display: inline-block;">
                     <div class="v-dialog__activator">
-                      <button type="button" @click="delete_category()" class="v-btn theme--dark red">
+                      <button type="button" @click="delete_user()" class="v-btn theme--dark red">
                         <div class="v-btn__content">Delete</div>
                       </button>
                     </div>
@@ -111,7 +122,6 @@
             </v-card>
           </v-dialog>
         </v-flex>  
-
       </v-layout>
     </v-container>
   </div>
@@ -119,25 +129,39 @@
 
 <script>
 import Api from '@/api/api';
+import store from '@/store/store';
 
 export default {
   data () {
     return {
       search: '',
-      categories: {
+      users: {
         selected: [],
-        headers: [
+        userHeaders: [
           {
-            text: 'Name',
-            value: 'name',
+            text: 'Image',
+            value: 'image',
           },
           {
-            text: 'Description',
-            value: 'description'
+            text: 'First Name',
+            value: 'first_name'
+          },
+          {
+            text: 'Last Name',
+            value: 'last_name'
+          },
+          {
+            text: 'Email',
+            value: 'email'
+          },
+          {
+            text: 'Contact',
+            value: 'contact'
           },
           {
             text: 'Actions',
-            value: 'actions'
+            value: 'actions',
+            align: 'center'
           },
         ],
         items: []
@@ -146,66 +170,81 @@ export default {
         show_add: false,
         show_delete: false
       },
-      category: {
-        name: '',
-        description: ''
+      user: {
+        first_name: '',
+        last_name: '',
+        email: '',
+        username: '',
+        password: '',
+        contact: '',
+        address: '',
+        level: null
       },
-      delete_id: null
+      delete_id: null,
+      isAdmin: false
     };
   },
   methods: {
-    view_delete (product_id) {
-      this.delete_id = product_id;
+    view_delete (id) {
+      this.delete_id = id;
       this.dialog.show_delete = true;
     },
-    async delete_category () {
+    async delete_user () {
 
       try {
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        await Api().delete('category/' + this.delete_id, config).then(response => {
+        await Api().delete('user/' + this.delete_id, config).then(response => {
           this.dialog.show_delete = false;
-          this.get_categories();
-          window.getApp.$emit('CATEGORY_DELETED_SUCCESS');
+          this.get_users();
+          window.getApp.$emit('USER_DELETED_SUCCESS');
         });
       } catch (error) { 
         this.dialog.show_delete = false;
-        window.getApp.$emit('CATEGORY_DELETED_FAIL');
+        window.getApp.$emit('PRODUCT_DELETED_FAIL');
       }
 
     },
-    get_categories () {
+    view_user (user_id) {
+      this.$router.push('/user/' + user_id);
+    },
+    get_users () {
       let config = {
         headers: { 'Authorization': this.$store.state.token }
       };
 
-      Api().get('category', config).then(response => {
-        this.categories.items = response.data.categories;
+      Api().get('user', config).then(response => {
+        this.users.items = response.data.users.filter(u => u.level !== 0);
       });
     },
-    async add_category () { 
+    async add_user () { 
 
       try {
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        await Api().post('category', this.category, config).then(response => {
+        await Api().post('user', this.product, config).then(response => {
           this.dialog.show_add = false;
-          this.get_categories();
-          window.getApp.$emit('CATEGORY_ADDED_SUCCESS');
+          this.get_users();
+          window.getApp.$emit('USER_ADDED_SUCCESS');
         });
       } catch (error) { 
         this.dialog.show_add = false;
-        window.getApp.$emit('CATEGORY_ADDED_FAIL');
+        window.getApp.$emit('USER_ADDED_FAIL');
       }
     }
   },
   // eslint-disable-next-line
   created: function () {
-    this.get_categories();
+    
+    if (store.state.user.level === 0) {
+      this.isAdmin = true;
+    }
+
+    this.get_users();
   },
 };
 </script>

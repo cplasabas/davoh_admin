@@ -101,5 +101,85 @@ export default [
         text: 'Product delete fail.'
       };
     }
+  },
+  {
+    name: 'CATEGORY_ADDED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'category added successfully.'
+      };
+    }
+  },
+  {
+    name: 'CATEGORY_ADDED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'category add fail.'
+      };
+    }
+  },
+  {
+    name: 'CATEGORY_DELETED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'category delete successfully.'
+      };
+    }
+  },
+  {
+    name: 'CATEGORY_DELETED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'category delete fail.'
+      };
+    }
+  },
+  {
+    name: 'USER_ADDED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'user added successfully.'
+      };
+    }
+  },
+  {
+    name: 'USER_ADDED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'user add fail.'
+      };
+    }
+  },
+  {
+    name: 'USER_DELETED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'user delete successfully.'
+      };
+    }
+  },
+  {
+    name: 'USER_DELETED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'user delete fail.'
+      };
+    }
   }
 ];

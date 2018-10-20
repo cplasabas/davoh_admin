@@ -19,7 +19,7 @@ Vue.use(moment);
 
 Vue.use(VueCurrencyFilter,
   {
-    symbol: '$',
+    symbol: '₱',
     thousandsSeparator: ',',
     fractionCount: 2,
     fractionSeparator: '.',
