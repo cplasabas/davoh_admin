@@ -39,19 +39,19 @@
                           full-width
                           :nudge-bottom="-22"
                           max-width="290px"
-                          :return-value.sync="date"
+                          :return-value.sync="expense.date"
                         >
                           <v-text-field
                             slot="activator"
                             label="Date"
-                            v-model="date"
+                            v-model="expense.date"
                             append-icon="event"
                             readonly
                           ></v-text-field>
-                          <v-date-picker v-model="date" no-title scrollable>
+                          <v-date-picker v-model="expense.date" no-title scrollable>
                             <v-spacer></v-spacer>
                             <v-btn flat color="primary" @click="date_menu = false">Cancel</v-btn>
-                            <v-btn flat color="primary" @click="$refs.statDate.save(date)">OK</v-btn>
+                            <v-btn flat color="primary" @click="$refs.statDate.save(expense.date)">OK</v-btn>
                           </v-date-picker>
                         </v-menu>
                       </v-flex>

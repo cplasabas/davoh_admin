@@ -103,6 +103,26 @@ export default [
     }
   },
   {
+    name: 'PRODUCT_UPDATE_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Product update successfully.'
+      };
+    }
+  },
+  {
+    name: 'PRODUCT_UPDATE_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'Product update fail.'
+      };
+    }
+  },
+  {
     name: 'EXPENSE_ADDED_SUCCESS',
     callback: function (e) {
       this.snackbar = {
