@@ -3,89 +3,89 @@
     <v-container grid-list-xl fluid>
       <v-layout row wrap justify-end>
         <v-flex lg2 >
-            <v-dialog v-model="dialog.show_add" v-show="isAdmin" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
+            <v-dialog v-model="dialog.show_add" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
               <v-btn color="primary" dark slot="activator">
                 <v-icon >add</v-icon>
                 add
               </v-btn>
               <v-card>
-                <v-card-title>
-                  <span class="headline">New Product</span>
-                </v-card-title>
-                <v-divider></v-divider>
-                <v-card-text>
-                  <v-container grid-list-md>
-                    <v-layout wrap>
-                      <v-flex xs12 sm12 md12>
-                        <v-text-field v-model="product.code" label="Product Code" hint="Code of the Product" required></v-text-field>
+                <v-form method="post" action="#" id="prodcutForm" v-model="productFormValid">
+                  <v-card-title>
+                    <span class="headline">New Product</span>
+                  </v-card-title>
+                  <v-divider></v-divider>
+                  <v-card-text>
+                    <v-container grid-list-md>
+                      <v-layout wrap>
+                        <v-flex xs6 sm6 md6>
+                          <v-text-field v-model="product.code" label="Product Code" hint="*Code of the Product" :rules="[rules.required]" clearable></v-text-field>
+                        </v-flex>
+                        <v-flex xs6 sm6>
+                          <v-select
+                            label="Category"
+                            required
+                            v-model="product.category_id"
+                            :items="categories"
+                            :rules="[rules.required]"
+                          ></v-select>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-textarea v-model="product.description" name="description" label="Description" hint="*Description of the product"
+                          clearable ></v-textarea>
+                        </v-flex>
+                        <v-flex xs12 sm3 md3>
+                          <v-text-field v-model="product_details.gold_weight" label="Gold" hint="*Gold Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm3 md3>
+                          <v-text-field v-model="product_details.diamond_weight" label="Diamond" hint="*Diamond Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
+                        </v-flex>
+                      <!-- <v-flex xs12 sm4 lg4>
+                        <v-menu
+                          class="pr-2"
+                          ref="statDate"
+                          lazy
+                          :close-on-content-click="false"
+                          v-model="manufacture_date_menu"
+                          transition="scale-transition"
+                          offset-y
+                          full-width
+                          :nudge-bottom="-22"
+                          max-width="290px"
+                          :return-value.sync="manufacture_date"
+                        >
+                          <v-text-field
+                            slot="activator"
+                            label="Manufacture Date"
+                            v-model="manufacture_date"
+                            append-icon="event"
+                            readonly
+                          ></v-text-field>
+                          <v-date-picker v-model="manufacture_date" no-title scrollable>
+                            <v-spacer></v-spacer>
+                            <v-btn flat color="primary" @click="manufacture_date_menu = false">Cancel</v-btn>
+                            <v-btn flat color="primary" @click="$refs.statDate.save(manufacture_date)">OK</v-btn>
+                          </v-date-picker>
+                        </v-menu>
                       </v-flex>
-                      <v-flex xs12 sm12 md12>
-                        <v-textarea v-model="product.description" name="description" label="Description" hint="Description of the product"
-                        ></v-textarea>
+                      <v-flex xs12 sm4 lg 4>
+                        <v-text-field v-model="product.manufacture_cost" label="Manufacture Cost" value="00.00" prefix="$"></v-text-field>
                       </v-flex>
-                      <v-flex xs12 sm6>
-                        <v-autocomplete
-                          label="Category"
-                          required
-                          v-model="product.category_id"
-                          :items="categories"
-                        ></v-autocomplete>
+                      <v-flex xs12 sm4 lg 4>
+                        <v-text-field v-model="product.labor" label="Labor" value="00.00" prefix="$"></v-text-field>
+                      </v-flex> -->
+                      <v-flex xs4 sm6 lg6>
+                        <v-text-field v-model="product.price" label="SRP" hint="*Selling Price" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
                       </v-flex>
-                      <v-flex xs12 sm4 md4>
-                        <v-text-field v-model="product.carat" label="Carat" hint="Carat Count"></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm4 md4>
-                        <v-text-field v-model="product.gold" label="Gold" hint="Gold Count"></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm4 md4>
-                        <v-text-field v-model="product.diamond" label="Diamond" hint="Diamond Count"></v-text-field>
-                      </v-flex>
-                     <v-flex xs12 sm4 lg4>
-                      <v-menu
-                        class="pr-2"
-                        ref="statDate"
-                        lazy
-                        :close-on-content-click="false"
-                        v-model="manufacture_date_menu"
-                        transition="scale-transition"
-                        offset-y
-                        full-width
-                        :nudge-bottom="-22"
-                        max-width="290px"
-                        :return-value.sync="manufacture_date"
-                      >
-                        <v-text-field
-                          slot="activator"
-                          label="Manufacture Date"
-                          v-model="manufacture_date"
-                          append-icon="event"
-                          readonly
-                        ></v-text-field>
-                        <v-date-picker v-model="manufacture_date" no-title scrollable>
-                          <v-spacer></v-spacer>
-                          <v-btn flat color="primary" @click="manufacture_date_menu = false">Cancel</v-btn>
-                          <v-btn flat color="primary" @click="$refs.statDate.save(manufacture_date)">OK</v-btn>
-                        </v-date-picker>
-                      </v-menu>
-                    </v-flex>
-                    <v-flex xs12 sm4 lg 4>
-                      <v-text-field v-model="product.manufacture_cost" label="Manufacture Cost" value="00.00" prefix="$"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm4 lg 4>
-                      <v-text-field v-model="product.labor" label="Labor" value="00.00" prefix="$"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm12 lg 12>
-                      <v-text-field v-model="product.price" label="Price" value="00.00" prefix="$"></v-text-field>
-                    </v-flex>
-                    </v-layout>
-                  </v-container>
-                  <small>*indicates required field</small>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                  <v-btn color="primary" flat @click="add_product()">Add</v-btn>
-                </v-card-actions>
+                      </v-layout>
+                    </v-container>
+                    <small>*indicates required field</small>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
+                    <v-btn color="primary" flat @click="add_product()" :disabled="!productFormValid">Add</v-btn>
+                  </v-card-actions>
+                </v-form>
               </v-card>
             </v-dialog>
         </v-flex>
@@ -110,82 +110,31 @@
             <v-divider></v-divider>
             <v-card-text class="pa-0">
               <v-data-table
-                :headers="products.adminHeaders"
+                :headers="products.headers"
                 :search="search"
                 :items="products.items"
                 :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
                 class="elevation-1"
-                item-key="name"
-                select-all
-                v-show="isAdmin"
-                v-model="products.selected"
+                item-key="name"              
                 >
-                <template slot="items" slot-scope="props">
-                <td>
-                  <v-checkbox
-                    primary
-                    hide-details
-                    v-model="props.selected"
-                  ></v-checkbox>
-                </td>              
-                  <td>
-                    <v-avatar size="32">
-                      <img :src="props.item.image" alt="">
-                    </v-avatar> 
-                  </td>
-                  <td>{{ props.item.code }}</td>
-                  <td>{{ props.item.category.name }}</td>
-                  <!-- <td>{{ props.item.labor | currency }}</td> -->
-                  <td>{{ props.item.manufacture_cost | currency }}</td>
-                  <!-- <td>{{ props.item.manufacture_date | moment("MMMM Do YYYY") }}</td> -->
-                  <td>{{ props.item.price | currency }}</td>
-                  <td>{{ props.item.product_status.status}}</td>
+                <template slot="items" slot-scope="props">         
                   <td class="text-xs-center">
-                    <v-btn @click="view_product(props.item.id)" depressed outline icon fab dark color="green" small>
-                      <v-icon>remove_red_eye</v-icon>
-                    </v-btn>
-                    <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
-                      <v-icon>delete</v-icon>
-                    </v-btn>
-                  </td>
-                </template>
-              </v-data-table>
-            </v-card-text>
-            <v-card-text class="pa-0">
-              <v-data-table
-                :headers="products.nonAdminHeaders"
-                :search="search"
-                :items="products.items"
-                :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
-                class="elevation-1"
-                item-key="name"
-                select-all
-                v-show="isNotAdmin"
-                v-model="products.selected"
-                
-                >
-                <template slot="items" slot-scope="props">
-                <td>
-                  <v-checkbox
-                    primary
-                    hide-details
-                    v-model="props.selected"
-                  ></v-checkbox>
-                </td>              
-                  <td>
                     <v-avatar size="32">
                       <img :src="props.item.image" alt="">
                     </v-avatar> 
                   </td>
                   <td>{{ props.item.code }}</td>
                   <td>{{ props.item.category.name}}</td>
-                  <td>{{ props.item.gold }}</td>
-                  <td>{{ props.item.diamond }}</td>
+                  <td>{{ props.item.product_detail.gold_weight }}g</td>
+                  <td>{{ props.item.product_detail.diamond_weight }}g</td>
                   <td>{{ props.item.price | currency }}</td>
                   <td>{{ props.item.product_status.status}}</td>
-                  <td>
-                    <v-btn @click="view_product(props.item.id)" depressed outline icon fab dark color="green" small>
+                  <td class="text-xs-center">
+                     <v-btn @click="view_product(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>remove_red_eye</v-icon>
+                    </v-btn>
+                    <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
+                      <v-icon>delete</v-icon>
                     </v-btn>
                   </td>
                 </template>
@@ -227,7 +176,6 @@
 <script>
 import Api from '@/api/api';
 import store from '@/store/store';
-import moment from 'moment';
 
 export default {
   data () {
@@ -235,51 +183,12 @@ export default {
       search: '',
       categories: [],
       products: {
-        selected: [],
-        adminHeaders: [
+        headers: [
           {
             text: 'Image',
             value: 'image',
-          },
-          {
-            text: 'Code',
-            value: 'code'
-          },
-          {
-            text: 'Category',
-            value: 'category'
-          },
-          // {
-          //   text: 'Labor',
-          //   value: 'labor'
-          // },
-          {
-            text: 'Manufacture Cost',
-            value: 'manufacture_cost'
-          },
-          // {
-          //   text: 'Manufacture Date',
-          //   value: 'manufacture_date'
-          // },
-          {
-            text: 'Price',
-            value: 'price'
-          },
-          {
-            text: 'Status',
-            value: 'status'
-          },
-          {
-            text: 'Actions',
-            value: 'actions',
             align: 'center'
           },
-        ],
-        nonAdminHeaders: [
-          {
-            text: 'Image',
-            value: 'image',
-          },
           {
             text: 'Code',
             value: 'code'
@@ -289,12 +198,12 @@ export default {
             value: 'category'
           },
           {
-            text: 'Diamond (kg)',
-            value: 'diamond'
+            text: 'Diamond (g)',
+            value: 'diamond_weight'
           },
           {
-            text: 'Gold (kg)',
-            value: 'gold'
+            text: 'Gold (g)',
+            value: 'gold_weight'
           },
           {
             text: 'Price',
@@ -316,23 +225,21 @@ export default {
         show_add: false,
         show_delete: false
       },
-      manufacture_date_menu: false,
-      manufacture_date: null,
       product: {
         code: '',
         description: '',
         category_id: null,
-        carat: null,
-        gold: null,
-        diamond: null,
-        manufacture_date: null,
-        manufacture_cost: null,
-        labor: null,
         price: null
       },
+      product_details: {
+        gold_weight: null,
+        diamond_weight: null
+      },
       delete_id: null,
-      isAdmin: false,
-      isNotAdmin: false
+      productFormValid: false,
+      rules: {
+        required: value => !!value || 'Required.',
+      }
     };
   },
   methods: {
@@ -398,8 +305,20 @@ export default {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        this.product.manufacture_date = moment(this.manufacture_date).format();
         await Api().post('product', this.product, config).then(response => {
+          this.add_product_details(response.data.product.id);
+        });
+      } catch (error) { 
+        this.dialog.show_add = false;
+        window.getApp.$emit('PRODUCT_ADDED_FAIL');
+      }
+    },
+    async add_product_details (id) {
+      try {
+        let config = {
+          headers: { 'Authorization': this.$store.state.token }
+        };
+        await Api().put('product_details/' + id, this.product_details, config).then(response => {
           this.dialog.show_add = false;
           this.get_products();
           window.getApp.$emit('PRODUCT_ADDED_SUCCESS');
@@ -412,15 +331,6 @@ export default {
   },
   // eslint-disable-next-line
   created: function () {
-
-    if (store.state.user.level === 0) {
-      this.isAdmin = true;
-      this.isNotAdmin = false;
-    } else {
-      this.isNotAdmin = true;
-      this.isAdmin = false;
-    }
-
     this.get_products();
     this.get_categories();
   },

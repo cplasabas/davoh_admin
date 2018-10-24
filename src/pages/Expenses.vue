@@ -4,7 +4,7 @@
       <v-layout row wrap justify-end>
         <v-flex lg2 >
             <v-dialog v-model="dialog.show_add" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
-              <v-btn color="primary" dark slot="activator">
+              <v-btn @click="view_add" color="primary" dark slot="activator">
                 <v-icon >add</v-icon>
                 add
               </v-btn>
@@ -24,9 +24,38 @@
                         <v-textarea v-model="expense.description" label="Description" hint="Description"
                         ></v-textarea>
                       </v-flex>
-                      <v-flex xs12 sm12 lg 12>
-                        <v-text-field v-model="expense.amount" label="Amount" value="00.00" prefix="$"></v-text-field>
+                      <v-flex xs6 sm6 lg6>
+                        <v-text-field v-model="expense.amount" label="Amount" value="00.00" prefix="₱"></v-text-field>
                       </v-flex>
+                      <v-flex xs6 sm4 lg4>
+                        <v-menu
+                          class="pr-2"
+                          ref="statDate"
+                          lazy
+                          :close-on-content-click="false"
+                          v-model="date_menu"
+                          transition="scale-transition"
+                          offset-y
+                          full-width
+                          :nudge-bottom="-22"
+                          max-width="290px"
+                          :return-value.sync="date"
+                        >
+                          <v-text-field
+                            slot="activator"
+                            label="Date"
+                            v-model="date"
+                            append-icon="event"
+                            readonly
+                          ></v-text-field>
+                          <v-date-picker v-model="date" no-title scrollable>
+                            <v-spacer></v-spacer>
+                            <v-btn flat color="primary" @click="date_menu = false">Cancel</v-btn>
+                            <v-btn flat color="primary" @click="$refs.statDate.save(date)">OK</v-btn>
+                          </v-date-picker>
+                        </v-menu>
+                      </v-flex>
+                      
                     </v-layout>
                   </v-container>
                   <small>*indicates required field</small>
@@ -82,7 +111,8 @@
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description}}</td>
                   <td>{{ props.item.amount | currency }}</td>
-                  <td>
+                   <td>{{ props.item.date | moment("MMMM D, YYYY") }}</td>
+                  <td class="text-xs-center">
                     <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>create</v-icon>
                     </v-btn>
@@ -128,6 +158,7 @@
 
 <script>
 import Api from '@/api/api';
+import moment from 'moment';
 
 export default {
   data () {
@@ -149,6 +180,10 @@ export default {
             value: 'amount'
           },
           {
+            text: 'Date',
+            value: 'date'
+          },
+          {
             text: 'Actions',
             value: 'actions',
             align: 'center'
@@ -156,6 +191,8 @@ export default {
         ],
         items: []
       },
+      date_menu: false,
+      date: null,
       dialog: { 
         show_add: false,
         show_delete: false
@@ -163,10 +200,12 @@ export default {
       expense: {
         name: '',
         description: '',
-        amount: 0
+        amount: 0,
+        date: null
       },
       is_edit: false,
-      delete_id: null
+      delete_id: null,
+      edit_id: null,
     };
   },
   methods: {
@@ -192,12 +231,44 @@ export default {
       }
 
     },
+    view_add (id) {
+
+      this.dialog.show_add = true;
+      this.is_edit = false;
+
+    },
     view_edit (id) {
-      this.show_add = true;
+      this.dialog.show_add = true;
+      this.edit_id = id;
       this.is_edit = true;
-      // $$.each(this.expenses.items[id], function(key, value) {
-      //   this.expense[key] = value
-      // });
+
+      let expense = this.expenses.items.filter(u => u.id === id);
+
+      for (let key in expense[0]) {
+        if (expense[0].hasOwnProperty(key)) {
+          if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
+            this.expense[key] = expense[0][key];
+          }
+        }
+      }
+
+      this.date = moment(expense.date).format('YYYY-MM-DD');
+    },
+    async edit_expense () {
+      try {
+        let config = {
+          headers: { 'Authorization': this.$store.state.token }
+        };
+
+        await Api().put('expense/' + this.edit_id, this.expense, config).then(response => {
+          this.dialog.show_add = false;
+          this.get_expenses();
+          window.getApp.$emit('EXPENSE_EDIT_SUCCESS');
+        });
+      } catch (error) { 
+        this.dialog.show_add = false;
+        window.getApp.$emit('EXPENSE_EDIT_FAIL');
+      }
     },
     get_expenses () {
       let config = {

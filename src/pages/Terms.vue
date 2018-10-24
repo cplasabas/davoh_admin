@@ -4,7 +4,7 @@
       <v-layout row wrap justify-end>
         <v-flex lg2 >
             <v-dialog v-model="dialog.show_add" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
-              <v-btn color="primary" dark slot="activator">
+              <v-btn @click="view_add" color="primary" dark slot="activator">
                 <v-icon >add</v-icon>
                 add
               </v-btn>
@@ -24,11 +24,14 @@
                         <v-textarea v-model="term.description" label="Description" hint="Description"
                         ></v-textarea>
                       </v-flex>
-                      <v-flex xs6 sm6 lg6>
-                        <v-text-field v-model="term.month" label="Month" value="0"></v-text-field>
+                      <v-flex xs4 sm4 lg4>
+                        <v-text-field v-model="term.months" label="Months" value="0"></v-text-field>
                       </v-flex>
-                      <v-flex xs6 sm6 lg6>
-                        <v-text-field v-model="term.year" label="Year" value="0"></v-text-field>
+                      <v-flex xs4 sm4 lg4>
+                        <v-text-field v-model="term.years" label="Years" value="0"></v-text-field>
+                      </v-flex>
+                       <v-flex xs4 sm4 lg4>
+                        <v-text-field v-model="term.days" label="Days" value="0"></v-text-field>
                       </v-flex>
                     </v-layout>
                   </v-container>
@@ -84,9 +87,10 @@
                 </td>              
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description}}</td>
-                  <td>{{ props.item.month }}</td>
-                  <td>{{ props.item.year }}</td>
-                  <td>
+                  <td>{{ props.item.months }}</td>
+                  <td>{{ props.item.years }}</td>
+                  <td>{{ props.item.days }}</td>
+                  <td class="text-xs-center">
                     <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>create</v-icon>
                     </v-btn>
@@ -149,12 +153,16 @@ export default {
             value: 'description'
           },
           {
-            text: 'Month',
-            value: 'month'
+            text: 'Months',
+            value: 'months'
           },
           {
-            text: 'Year',
-            value: 'year'
+            text: 'Years',
+            value: 'years'
+          },
+          {
+            text: 'Days',
+            value: 'days'
           },
           {
             text: 'Actions',
@@ -171,11 +179,13 @@ export default {
       term: {
         name: '',
         description: '',
-        month: 0,
-        year: 0
+        months: 0,
+        years: 0,
+        days: 0
       },
       is_edit: false,
-      delete_id: null
+      delete_id: null,
+      edit_id: null
     };
   },
   methods: {
@@ -201,12 +211,42 @@ export default {
       }
 
     },
+    view_add (id) {
+
+      this.dialog.show_add = true;
+      this.is_edit = false;
+
+    },
     view_edit (id) {
-      this.show_add = true;
+      this.dialog.show_add = true;
+      this.edit_id = id;
       this.is_edit = true;
-      // $$.each(this.terms.items[id], function(key, value) {
-      //   this.term[key] = value
-      // });
+
+      let term = this.terms.items.filter(u => u.id === id);
+
+      for (let key in term[0]) {
+        if (term[0].hasOwnProperty(key)) {
+          if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
+            this.term[key] = term[0][key];
+          }
+        }
+      }
+    },
+    async edit_term () {
+      try {
+        let config = {
+          headers: { 'Authorization': this.$store.state.token }
+        };
+
+        await Api().put('term/' + this.edit_id, this.term, config).then(response => {
+          this.dialog.show_add = false;
+          this.get_terms();
+          window.getApp.$emit('TERM_EDIT_SUCCESS');
+        });
+      } catch (error) { 
+        this.dialog.show_add = false;
+        window.getApp.$emit('TERM_EDIT_FAIL');
+      }
     },
     get_terms () {
       let config = {
@@ -227,11 +267,11 @@ export default {
         await Api().post('term', this.term, config).then(response => {
           this.dialog.show_add = false;
           this.get_terms();
-          window.getApp.$emit('Term_ADDED_SUCCESS');
+          window.getApp.$emit('TERM_ADDED_SUCCESS');
         });
       } catch (error) { 
         this.dialog.show_add = false;
-        window.getApp.$emit('Term_ADDED_FAIL');
+        window.getApp.$emit('TERM_ADDED_FAIL');
       }
     }
   },

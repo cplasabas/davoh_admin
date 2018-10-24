@@ -3,8 +3,8 @@
     <v-container grid-list-xl fluid>
       <v-layout row wrap justify-end>
         <v-flex lg2 >
-            <v-dialog v-model="dialog.show_add" v-show="isAdmin" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
-              <v-btn color="primary" dark slot="activator">
+            <v-dialog v-model="dialog.show_add" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
+              <v-btn @click="view_add" color="primary" dark slot="activator">
                 <v-icon >add</v-icon>
                 add
               </v-btn>
@@ -16,12 +16,31 @@
                 <v-card-text>
                   <v-container grid-list-md>
                     <v-layout wrap>
-                      <v-flex xs12 sm12 md12>
+                      <v-flex xs6 sm6 md6>
                         <v-text-field v-model="user.first_name" label="First Name" hint="First Name" required></v-text-field>
                       </v-flex>
+                      <v-flex xs6 sm6 md6>
+                        <v-text-field v-model="user.last_name" label="Last Name" hint="Last Name"
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs6 sm6 md6>
+                        <v-text-field v-model="user.username" label="Username" hint="Username" required></v-text-field>
+                      </v-flex>
+                      <v-flex xs6 sm6 md6>
+                        <v-text-field :type="'password'" v-model="user.password" label="Password" hint="Password"
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs6 sm6 md6>
+                        <v-text-field v-model="user.email" label="Email" hint="Email"
+                        ></v-text-field>
+                      </v-flex>
+                      <v-flex xs6 sm6 md6>
+                        <v-text-field v-model="user.contact" label="Contact" hint="Contact"
+                        ></v-text-field>
+                      </v-flex>
                       <v-flex xs12 sm12 md12>
-                        <v-textarea v-model="user.last_name" label="Last Name" hint="Last Name"
-                        ></v-textarea>
+                        <v-text-field v-model="user.address" label="Address" hint="Address"
+                        ></v-text-field>
                       </v-flex>
                     </v-layout>
                   </v-container>
@@ -30,7 +49,8 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                  <v-btn color="primary" flat @click="add_user()">Add</v-btn>
+                  <v-btn color="primary" v-if="is_edit" flat @click="edit_user()">EDIT</v-btn>
+                  <v-btn color="primary" v-else flat @click="add_user()">Add</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -83,9 +103,9 @@
                   <td>{{ props.item.last_name}}</td>
                   <td>{{ props.item.email }}</td>
                   <td>{{ props.item.contact }}</td>
-                  <td>
-                    <v-btn @click="view_product(props.item.id)" depressed outline icon fab dark color="green" small>
-                      <v-icon>remove_red_eye</v-icon>
+                  <td class="text-xs-center">
+                    <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
+                      <v-icon>create</v-icon>
                     </v-btn>
                     <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
                       <v-icon>delete</v-icon>
@@ -178,10 +198,12 @@ export default {
         password: '',
         contact: '',
         address: '',
-        level: null
+        level: 1
       },
       delete_id: null,
-      isAdmin: false
+      isAdmin: false,
+      is_edit: false,
+      edit_id: null
     };
   },
   methods: {
@@ -210,6 +232,50 @@ export default {
     view_user (user_id) {
       this.$router.push('/user/' + user_id);
     },
+    view_add (id) {
+
+      this.dialog.show_add = true;
+      this.is_edit = false;
+
+      for (let key in this.user) {
+        if (this.user.hasOwnProperty(key)) {
+          this.user[key] = '';
+        }
+      }
+      this.user.level = 1;
+    },
+    view_edit (id) {
+      this.dialog.show_add = true;
+      this.edit_id = id;
+      this.is_edit = true;
+
+      let user = this.users.items.filter(u => u.id === id);
+
+      for (let key in user[0]) {
+        if (user[0].hasOwnProperty(key)) {
+          if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
+            this.user[key] = user[0][key];
+          }
+        }
+      }
+      this.user.password = '';
+    },
+    async edit_user () {
+      try {
+        let config = {
+          headers: { 'Authorization': this.$store.state.token }
+        };
+
+        await Api().put('user/' + this.edit_id, this.user, config).then(response => {
+          this.dialog.show_add = false;
+          this.get_users();
+          window.getApp.$emit('USER_EDIT_SUCCESS');
+        });
+      } catch (error) { 
+        this.dialog.show_add = false;
+        window.getApp.$emit('USER_EDIT_FAIL');
+      }
+    },
     get_users () {
       let config = {
         headers: { 'Authorization': this.$store.state.token }
@@ -226,7 +292,7 @@ export default {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        await Api().post('user', this.product, config).then(response => {
+        await Api().post('register', this.user, config).then(response => {
           this.dialog.show_add = false;
           this.get_users();
           window.getApp.$emit('USER_ADDED_SUCCESS');

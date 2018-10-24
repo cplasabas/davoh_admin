@@ -4,7 +4,7 @@
       <v-layout row wrap justify-end>
         <v-flex lg2 >
             <v-dialog v-model="dialog.show_add" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
-              <v-btn color="primary" dark slot="activator">
+              <v-btn @click="view_add" color="primary" dark slot="activator">
                 <v-icon >add</v-icon>
                 add
               </v-btn>
@@ -30,7 +30,8 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                  <v-btn color="primary" flat @click="add_category()">Add</v-btn>
+                  <v-btn color="primary" v-if="is_edit" flat @click="edit_user()">EDIT</v-btn>
+                  <v-btn color="primary" v-else flat @click="add_category()">Add</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -76,6 +77,10 @@
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description }}</td>
                   <td>
+                  <td class="text-xs-center">
+                    <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
+                      <v-icon>create</v-icon>
+                    </v-btn>
                   <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
                     <v-icon>delete</v-icon>
                   </v-btn>
@@ -150,7 +155,10 @@ export default {
         name: '',
         description: ''
       },
-      delete_id: null
+      delete_id: null,
+      isAdmin: false,
+      is_edit: false,
+      edit_id: null
     };
   },
   methods: {
@@ -175,6 +183,49 @@ export default {
         window.getApp.$emit('CATEGORY_DELETED_FAIL');
       }
 
+    },  
+    view_add (id) {
+
+      this.dialog.show_add = true;
+      this.is_edit = false;
+
+      for (let key in this.category) {
+        if (this.category.hasOwnProperty(key)) {
+          this.category[key] = '';
+        }
+      }
+
+    },
+    view_edit (id) {
+      this.dialog.show_add = true;
+      this.edit_id = id;
+      this.is_edit = true;
+
+      let category = this.categories.items.filter(u => u.id === id);
+
+      for (let key in category[0]) {
+        if (category[0].hasOwnProperty(key)) {
+          if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
+            this.category[key] = category[0][key];
+          }
+        }
+      }
+    },
+    async edit_user () {
+      try {
+        let config = {
+          headers: { 'Authorization': this.$store.state.token }
+        };
+
+        await Api().put('category/' + this.edit_id, this.category, config).then(response => {
+          this.dialog.show_add = false;
+          this.get_categories();
+          window.getApp.$emit('CATEGORY_EDIT_SUCCESS');
+        });
+      } catch (error) { 
+        this.dialog.show_add = false;
+        window.getApp.$emit('CATEGORY_EDIT_FAIL');
+      }
     },
     get_categories () {
       let config = {

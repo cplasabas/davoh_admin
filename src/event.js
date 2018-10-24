@@ -103,6 +103,66 @@ export default [
     }
   },
   {
+    name: 'EXPENSE_ADDED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Expense added successfully.'
+      };
+    }
+  },
+  {
+    name: 'EXPENSE_ADDED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'Expense add fail.'
+      };
+    }
+  },
+  {
+    name: 'EXPENSE_DELETED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Expense delete successfully.'
+      };
+    }
+  },
+  {
+    name: 'EXPENSE_DELETED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'Expense delete fail.'
+      };
+    }
+  },
+  {
+    name: 'EXPENSE_EDIT_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Expense edited successfully.'
+      };
+    }
+  },
+  {
+    name: 'EXPENSE_EDIT_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'Expense edited fail.'
+      };
+    }
+  },
+  {
     name: 'CATEGORY_ADDED_SUCCESS',
     callback: function (e) {
       this.snackbar = {
@@ -143,6 +203,86 @@ export default [
     }
   },
   {
+    name: 'CATEGORY_EDIT_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'category edit successfully.'
+      };
+    }
+  },
+  {
+    name: 'CATEGORY_EDIT_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'category edit fail.'
+      };
+    }
+  },
+  {
+    name: 'TERM_ADDED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Term added successfully.'
+      };
+    }
+  },
+  {
+    name: 'TERM_ADDED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'Term add fail.'
+      };
+    }
+  },
+  {
+    name: 'TERM_DELETED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Term delete successfully.'
+      };
+    }
+  },
+  {
+    name: 'TERM_DELETED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'Ter, delete fail.'
+      };
+    }
+  },
+  {
+    name: 'TERM_EDIT_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Term edited successfully.'
+      };
+    }
+  },
+  {
+    name: 'TERM_EDIT_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'TERM edited fail.'
+      };
+    }
+  },
+  {
     name: 'USER_ADDED_SUCCESS',
     callback: function (e) {
       this.snackbar = {
@@ -179,6 +319,26 @@ export default [
         show: true,
         color: 'red',
         text: 'user delete fail.'
+      };
+    }
+  },
+  {
+    name: 'USER_EDIT_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'user edit successfully.'
+      };
+    }
+  },
+  {
+    name: 'USER_EDIT_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'user edit fail.'
       };
     }
   }

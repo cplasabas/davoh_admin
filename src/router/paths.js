@@ -84,7 +84,7 @@ export default [
     component: () => import(
       /* webpackChunkName: "routes" */
       /* webpackMode: "lazy-once" */
-      `@/pages/Product_View.vue`
+      `@/pages/Product.vue`
     )
   },
   {
