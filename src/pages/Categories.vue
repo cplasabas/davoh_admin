@@ -24,6 +24,9 @@
                           <v-textarea v-model="category.description" label="Description" hint="Description of the category" clearable
                           ></v-textarea>
                         </v-flex>
+                        <v-flex xs12 sm2 md2>
+                          <v-text-field type="number" v-model="category.commission_rate" label="Rate" hint="Rate" suffix="%" clearable></v-text-field>
+                        </v-flex>
                       </v-layout>
                     </v-container>
                     <small>*indicates required field</small>
@@ -69,6 +72,7 @@
                 <template slot="items" slot-scope="props">             
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description }}</td>
+                  <td>{{ props.item.commission_rate }}</td>
                   <td class="text-xs-center">
                     <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>create</v-icon>
@@ -131,6 +135,10 @@ export default {
           {
             text: 'Description',
             value: 'description'
+          },
+          {
+            text: 'Rate',
+            value: 'rate'
           },
           {
             text: 'Actions',

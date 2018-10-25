@@ -35,10 +35,13 @@
                           clearable ></v-textarea>
                         </v-flex>
                         <v-flex xs12 sm3 md3>
-                          <v-text-field type="number" v-model="product_details.gold_weight" label="Gold" hint="*Gold Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
+                          <v-text-field type="number" v-model="product_details.gold_weight" label="Gold" hint="*Gold Weight" suffix="gm" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm3 md3>
-                          <v-text-field type="number" v-model="product_details.diamond_weight" label="Diamond" hint="*Diamond Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
+                          <v-text-field type="number" v-model="product_details.gold_touch" label="Gold Touch" hint="*Gold Touch" suffix="K" :rules="[rules.required]" clearable></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm3 md3>
+                          <v-text-field type="number" v-model="product_details.diamond_weight" label="Diamond" hint="*Diamond Weight" suffix="ct" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
                       <!-- <v-flex xs12 sm4 lg4>
                         <v-menu
@@ -126,8 +129,9 @@
                   </td>
                   <td>{{ props.item.code }}</td>
                   <td>{{ props.item.category.name}}</td>
-                  <td>{{ props.item.product_detail.gold_weight }}g</td>
-                  <td>{{ props.item.product_detail.diamond_weight }}g</td>
+                  <td>{{ props.item.product_detail.gold_weight }}gm</td>
+                  <td>{{ props.item.product_detail.gold_touch }}K</td>
+                  <td>{{ props.item.product_detail.diamond_weight }}ct</td>
                   <td>{{ props.item.price | currency }}</td>
                   <td>{{ props.item.product_status.status}}</td>
                   <td class="text-xs-center">
@@ -199,12 +203,16 @@ export default {
             value: 'category'
           },
           {
-            text: 'Diamond (g)',
-            value: 'diamond_weight'
+            text: 'Gold (gm)',
+            value: 'gold_weight'
           },
           {
-            text: 'Gold (g)',
-            value: 'gold_weight'
+            text: 'Gold Touch (K)',
+            value: 'gold_touch'
+          },
+          {
+            text: 'Diamond (ct)',
+            value: 'diamond_weight'
           },
           {
             text: 'Price',

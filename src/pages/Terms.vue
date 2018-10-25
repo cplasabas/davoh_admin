@@ -25,13 +25,16 @@
                           <v-textarea v-model="term.description" label="Description" hint="Description" clearable
                           ></v-textarea>
                         </v-flex>
+                        <v-flex xs12 sm3 md3>
+                          <v-text-field type="number" v-model="term.interest" label="Interest" hint="Interest" suffix="%" clearable></v-text-field>
+                        </v-flex>
                         <v-flex xs3 sm3 lg3>
                           <v-text-field prepend-icon="calendar_today" type="number" v-model="term.years" label="Years" value="0"></v-text-field>
                         </v-flex>
-                        <v-flex xs3 sm3 lg3 offset-xs1 offset-sm1 offset-lg1>
+                        <v-flex xs3 sm3 lg3>
                           <v-text-field prepend-icon="calendar_today" type="number" v-model="term.months" label="Months" value="0"></v-text-field>
                         </v-flex>
-                        <v-flex xs3 sm3 lg3 offset-xs2 offset-sm2 offset-lg2>
+                        <v-flex xs3 sm3 lg3>
                           <v-text-field prepend-icon="calendar_today" type="number" v-model="term.days" label="Days" value="0"></v-text-field>
                         </v-flex>
                       </v-layout>
@@ -79,8 +82,9 @@
                 <template slot="items" slot-scope="props">       
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description}}</td>
-                  <td>{{ props.item.months }}</td>
+                  <td>{{ props.item.interest }}</td>
                   <td>{{ props.item.years }}</td>
+                  <td>{{ props.item.months }}</td>
                   <td>{{ props.item.days }}</td>
                   <td class="text-xs-center">
                     <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
@@ -145,12 +149,16 @@ export default {
             value: 'description'
           },
           {
-            text: 'Months',
-            value: 'months'
+            text: 'Interest (%)',
+            value: 'interest'
           },
           {
             text: 'Years',
             value: 'years'
+          },
+          {
+            text: 'Months',
+            value: 'months'
           },
           {
             text: 'Days',

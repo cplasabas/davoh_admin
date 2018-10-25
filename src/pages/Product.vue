@@ -29,7 +29,7 @@
                     <v-flex xs2 sm2 md2>
                       <v-text-field prefix="#" v-model="product.code" label="Product Code" hint="*Code of the Product" :rules="[rules.required]" clearable></v-text-field>
                     </v-flex>
-                    <v-flex xs2 sm2 md2>
+                    <v-flex xs2 sm3 md3>
                       <v-select
                         prepend-icon="layers"
                         label="Category"
@@ -44,7 +44,7 @@
                       clearable ></v-textarea>
                     </v-flex>
                     <v-flex xs12 sm12 md12>
-                      <div class="display-2 grey--text text--darken-1">Details</div>
+                      <div class="display-2 grey--text text--darken-1">Product Details</div>
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 sm12 md12>
@@ -52,7 +52,7 @@
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field type="number" v-model="product_detail.diamond_weight" label="D Weight" hint="Diamond Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
+                      <v-text-field type="number" v-model="product_detail.diamond_weight" label="D Weight" hint="Diamond Weight" suffix="ct" :rules="[rules.required]" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
                       <v-text-field v-if="isAdmin" v-model="product_detail.diamond_party" label="D Party" hint="Diamond Party" clearable></v-text-field>
@@ -68,16 +68,16 @@
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field type="number" v-model="product_detail.gold_weight" label="G Weight" hint="Gold Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
+                      <v-text-field type="number" v-model="product_detail.gold_weight" label="G Weight" hint="Gold Weight" suffix="gm" :rules="[rules.required]" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.gold_gross_weight" label="G Gross Weight" hint="Gold Gross Weight" suffix="kg" clearable></v-text-field>
+                      <v-text-field type="number" v-model="product_detail.gold_touch" label="G Touch" hint="Gold Touch" suffix="K" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.gold_net_weight" label="G Net Weight" hint="Gold Net Weight" suffix="kg" clearable></v-text-field>
+                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.gold_gross_weight" label="G Gross Weight" hint="Gold Gross Weight" suffix="gm" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.gold_touch" label="G Touch" hint="Gold Touch" suffix="K" clearable></v-text-field>
+                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.gold_net_weight" label="G Net Weight" hint="Gold Net Weight" suffix="gm" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
                       <v-text-field v-if="isAdmin" v-model="product_detail.gold_cost" label="G Cost" hint="Gold Cost" prefix="₱" clearable></v-text-field>
@@ -95,20 +95,22 @@
                     <v-flex xs12 sm4 md4>
                       <v-text-field v-model="product.price" label="SRP" hint="Selling Price" prefix="₱" clearable></v-text-field>
                     </v-flex>
-                    <v-flex xs12 sm12 md12>
-                      <div class="display-2 grey--text text--darken-1">Status</div>
+                    <v-flex xs12 sm12 md12 v-show="is_sold">
+                      <div class="display-2 grey--text text--darken-1">Payment Details</div>
                       <v-divider></v-divider>
                     </v-flex>
-                    <v-flex xs12 sm3 md3>
+                    <v-flex xs12 sm4 md4 v-show="is_sold">
                       <v-text-field v-model="product_status.seller" label="Client" hint="Client" clearable></v-text-field>
                     </v-flex>
-                    <v-flex xs12 sm2 md2>
-                      <v-text-field type="number" v-model="product_status.commission_rate" label="Rate" hint="Rate" suffix="%" clearable></v-text-field>
+                    <v-flex xs3 sm3 md3 v-show="is_sold">
+                      <v-select
+                        label="Payment Type"
+                        required
+                        v-model="product_status.type"
+                        :items="type"
+                      ></v-select>
                     </v-flex>
-                    <v-flex xs12 sm3 md3>
-                      <v-text-field v-model="product_status.commission" label="Commission" hint="Commission" prefix="₱" readonly></v-text-field>
-                    </v-flex>
-                    <v-flex xs3 sm3 md3>
+                    <v-flex xs3 sm3 md3 v-show="is_sold">
                       <v-select
                         label="Term"
                         required
@@ -116,10 +118,16 @@
                         :items="terms"
                       ></v-select>
                     </v-flex>
-                    <v-flex xs12 sm3 md3>
+                    <v-flex xs12 sm3 md3 v-show="is_sold">
                       <v-text-field v-model="product_status.selling_price" label="Sold Price" hint="Sold Price" prefix="₱"></v-text-field>
                     </v-flex>
-                    <v-flex xs12 sm4 lg4>
+                     <v-flex xs12 sm1 md1 v-show="is_sold">
+                      <v-text-field type="number" v-model="commission_rate" label="Rate" hint="Rate" suffix="%" readonly></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm3 md3 v-show="is_sold">
+                      <v-text-field v-model="product_status.commission" label="Commission" hint="Commission" prefix="₱" readonly></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm3 lg3 v-show="is_sold">
                       <v-menu
                         class="pr-2"
                         ref="statDate"
@@ -146,6 +154,25 @@
                           <v-btn flat color="primary" @click="$refs.statDate.save(product_status.sold_date)">OK</v-btn>
                         </v-date-picker>
                       </v-menu>
+                    </v-flex>
+                    <v-flex xs12 sm12 md12 v-show="is_sold && is_term">
+                      <div class="headline grey--text text--darken-1">Term Details</div>
+                      <v-divider></v-divider>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2 v-show="is_sold && is_term">
+                      <v-text-field v-model="product_status.paid" label="Paid" hint="Paid" prefix="₱"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2 v-show="is_sold && is_term">
+                      <v-text-field v-model="balance" label="Balance" hint="Balance" prefix="₱" readonly></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm1 md1 v-show="is_sold && is_term">
+                      <v-text-field type="number" v-model="interest" label="Interest" hint="Interest" suffix="%" readonly></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2 v-show="is_sold && is_term">
+                      <v-text-field v-model="payment_amount" label="Amount" hint="Amount" prefix="₱" readonly></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm3 md3 v-show="is_sold && is_term">
+                      <v-text-field append-icon="event" v-model="due_date" label="Due Date" hint="Due Date" readonly></v-text-field>
                     </v-flex>
                   </v-layout>
                 </v-container>
@@ -187,7 +214,19 @@ export default {
           value: 'Sold'
         }
       ],
+      type: [
+        {
+          text: 'Without Agent',
+          value: 0
+        },
+        {
+          text: 'With Agent',
+          value: 1
+        }
+      ],
+      original_categories: [],
       categories: [],
+      original_terms: [],
       terms: [],
       product: {
         code: '',
@@ -211,18 +250,26 @@ export default {
       product_status: {
         status: null,
         seller: null,
-        commission_rate: 0,
-        commission: 0,
         selling_price: 0,
+        commission: 0,
         sold_date: 0,
-        term_id: null
+        term_id: null,
+        paid: null,
       },
       sold_date_menu: false,
       sold_date: null,
       rules: {
         required: value => !!value || 'Required.',
       },
+      is_sold: false,
+      is_term: false,
       isAdmin: false,
+      due_date: null,
+      commission_rate: 0,
+      commission: 0,
+      balance: 0,
+      interest: 0,
+      payment_amount: 0,
       money: {
         decimal: '.',
         thousands: ',',
@@ -232,17 +279,37 @@ export default {
     };
   },
   computed: {
-    commission_rate () {
-      return this.product_status.commission_rate;
+    product_category () {
+      return this.product.category_id;
     },
     product_price () {
       return this.product_status.selling_price;
+    },
+    product_sold_date () {
+      return this.product_status.sold_date;
+    },
+    payment_status () {
+      return this.product_status.status;
+    },
+    payment_term () {
+      return this.product_status.term_id;
+    },
+    payment_paid () {
+      return this.product_status.paid;
     }
   },
   watch: {
     sold_date () {
       this.product_status.sold_date = moment(this.sold_date).format('MMMM D, YYYY');
     },
+    product_category () {
+      setTimeout(function () {
+        let category = this.original_categories.filter(u => u.id === this.product.category_id);
+
+        this.commission_rate = category[0].commission_rate;
+
+      }.bind(this), 100);
+    },
     commission_rate () {
       if (this.commission_rate && this.product_status.selling_price) {
         this.product_status.commission = this.product_status.selling_price * (this.commission_rate / 100);
@@ -251,7 +318,68 @@ export default {
     product_price () {
       if (this.commission_rate && this.product_status.selling_price) {
         this.product_status.commission = this.product_status.selling_price * (this.commission_rate / 100);
+        
+        let term = this.original_terms.filter(u => u.id === this.product_status.term_id);
+
+        let days = term[0].days + (term[0].months * 30) + ((term[0].years * 12) * 30);
+
+        let payment_amount = this.product_status.selling_price / days;
+
+        if (term[0].interest) {
+          let interest_amount = payment_amount * (term[0].interest / 100);
+          payment_amount += interest_amount;
+        }
+
+        this.payment_amount = payment_amount.toFixed(2);
       }
+    },
+    payment_status () {
+      if (this.product_status.status === 'Sold') {
+        this.is_sold = true;
+      } else {
+        this.is_sold = false;
+      }
+    },
+    payment_term () {
+
+      setTimeout(function () {
+        let term = this.original_terms.filter(u => u.id === this.product_status.term_id);
+        if (typeof term !== 'undefined' && term[0].name !== 'Cash') {
+          this.interest = term[0].interest;
+          this.is_term = true;
+
+          let days = term[0].days + (term[0].months * 30) + ((term[0].years * 12) * 30);
+
+          let payment_amount = this.product_status.selling_price / days;
+
+          if (term[0].interest) {
+            let interest_amount = payment_amount * (term[0].interest / 100);
+            payment_amount += interest_amount;
+          }
+
+          this.payment_amount = payment_amount.toFixed(2);
+        } else {
+          this.is_term = false;
+        }
+
+      }.bind(this), 100);
+    },
+    payment_paid () {
+      if (this.product_status.paid) {
+        this.balance = this.product_status.selling_price - this.product_status.paid;
+      }
+    },
+    product_sold_date () {
+      setTimeout(function () {
+        let term = this.original_terms.filter(u => u.id === this.product_status.term_id);
+
+        this.due_date = moment(this.product_status.sold_date)
+          .add(term[0].years, 'years')
+          .add(term[0].months, 'months')
+          .add(term[0].days, 'days')
+          .format('MMMM D, YYYY');
+
+      }.bind(this), 100);
     }
   },
   methods: {
@@ -323,6 +451,7 @@ export default {
       };
 
       Api().get('category', config).then(response => {
+        this.original_categories = response.data.categories;
         response.data.categories.map((val) => {
           this.categories.push({
             text: val.name,
@@ -338,6 +467,7 @@ export default {
       };
 
       Api().get('term', config).then(response => {
+        this.original_terms = response.data.terms;
         response.data.terms.map((val) => {
           this.terms.push({
             text: val.name,
