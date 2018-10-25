@@ -197,24 +197,24 @@ export default {
       },
       product_detail: {
         diamond_party: '',
-        diamond_cost: null,
-        diamond_size: null,
-        diamond_weight: null,
-        gold_weight: null,
-        gold_gross_weight: null,
-        gold_touch: null,
-        gold_cost: null,
-        labor: null,
-        manufacture_cost: null,
-        manufacture_date: null,
+        diamond_cost: 0,
+        diamond_size: 0,
+        diamond_weight: 0,
+        gold_weight: 0,
+        gold_gross_weight: 0,
+        gold_touch: 0,
+        gold_cost: 0,
+        labor: 0,
+        manufacture_cost: 0,
+        manufacture_date: 0,
       },
       product_status: {
         status: null,
-        sellet: null,
-        commission_rate: null,
-        commission: null,
-        selling_price: null,
-        sold_date: null,
+        seller: null,
+        commission_rate: 0,
+        commission: 0,
+        selling_price: 0,
+        sold_date: 0,
         term_id: null
       },
       sold_date_menu: false,
@@ -236,7 +236,7 @@ export default {
       return this.product_status.commission_rate;
     },
     product_price () {
-      return this.product.price;
+      return this.product_status.selling_price;
     }
   },
   watch: {
@@ -244,13 +244,13 @@ export default {
       this.product_status.sold_date = moment(this.sold_date).format('MMMM D, YYYY');
     },
     commission_rate () {
-      if (this.commission_rate) {
-        this.product_status.commission = this.product.price * (this.commission_rate / 100);
+      if (this.commission_rate && this.product_status.selling_price) {
+        this.product_status.commission = this.product_status.selling_price * (this.commission_rate / 100);
       }
     },
     product_price () {
-      if (this.commission_rate) {
-        this.product_status.commission = this.product.price * (this.commission_rate / 100);
+      if (this.commission_rate && this.product_status.selling_price) {
+        this.product_status.commission = this.product_status.selling_price * (this.commission_rate / 100);
       }
     }
   },
