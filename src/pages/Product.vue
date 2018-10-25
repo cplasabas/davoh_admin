@@ -269,7 +269,7 @@ export default {
         this.product_status = product.product_status;
         delete product.product_status;
         
-        if(this.product_status.sold_date){
+        if (this.product_status.sold_date) {
           this.product_status.sold_date = moment(this.product_status.sold_date).format('MMMM D, YYYY');
         }
         
