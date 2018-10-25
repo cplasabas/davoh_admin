@@ -3,7 +3,7 @@
     <v-container grid-list-xl fluid>
       <v-layout row wrap justify-end>
         <v-flex lg2 >
-            <v-dialog v-model="dialog.show_add" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
+            <v-dialog v-model="dialog.show_add" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="500px">
               <v-btn @click="view_add" color="primary" dark slot="activator">
                 <v-icon >add</v-icon>
                 add
@@ -14,43 +14,45 @@
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
-                  <v-container grid-list-md>
-                    <v-layout wrap>
-                      <v-flex xs6 sm6 md6>
-                        <v-text-field v-model="user.first_name" label="First Name" hint="First Name" required></v-text-field>
-                      </v-flex>
-                      <v-flex xs6 sm6 md6>
-                        <v-text-field v-model="user.last_name" label="Last Name" hint="Last Name"
-                        ></v-text-field>
-                      </v-flex>
-                      <v-flex xs6 sm6 md6>
-                        <v-text-field v-model="user.username" label="Username" hint="Username" required></v-text-field>
-                      </v-flex>
-                      <v-flex xs6 sm6 md6>
-                        <v-text-field :type="'password'" v-model="user.password" label="Password" hint="Password"
-                        ></v-text-field>
-                      </v-flex>
-                      <v-flex xs6 sm6 md6>
-                        <v-text-field v-model="user.email" label="Email" hint="Email"
-                        ></v-text-field>
-                      </v-flex>
-                      <v-flex xs6 sm6 md6>
-                        <v-text-field v-model="user.contact" label="Contact" hint="Contact"
-                        ></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm12 md12>
-                        <v-text-field v-model="user.address" label="Address" hint="Address"
-                        ></v-text-field>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                  <small>*indicates required field</small>
+                  <v-form method="post" action="#" id="userForm" v-model="userFormValid">
+                    <v-container grid-list-md>
+                      <v-layout wrap>
+                        <v-flex xs12 sm12 md12>
+                          <v-text-field prepend-icon="perm_identity" v-model="user.first_name" label="First Name" hint="First Name" :rules="[rules.required]"></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-text-field prepend-icon="perm_identity" v-model="user.last_name" label="Last Name" hint="Last Name" :rules="[rules.required]"
+                          ></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-text-field prepend-icon="account_box" v-model="user.username" label="Username" hint="Username" :rules="[rules.required]"></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-text-field prepend-icon="lock" :type="'password'" v-model="user.password" label="Password" hint="Password" :rules="[rules.required]"
+                          ></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-text-field prepend-icon="mail_outline" v-model="user.email" label="Email" hint="Email" :rules="[rules.required]"
+                          ></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-text-field prepend-icon="phone" v-model="user.contact" label="Contact" hint="Contact"
+                          ></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-text-field prepend-icon="place" v-model="user.address" label="Address" hint="Address"
+                          ></v-text-field>
+                        </v-flex>
+                      </v-layout>
+                    </v-container>
+                    <small>*indicates required field</small>
+                  </v-form>
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                  <v-btn color="primary" v-if="is_edit" flat @click="edit_user()">EDIT</v-btn>
-                  <v-btn color="primary" v-else flat @click="add_user()">Add</v-btn>
+                  <v-btn color="primary" v-if="is_edit" flat @click="edit_user()" :disabled="!userFormValid">EDIT</v-btn>
+                  <v-btn color="primary" v-else flat @click="add_user()" :disabled="!userFormValid">Add</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -82,23 +84,8 @@
                 :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
                 class="elevation-1"
                 item-key="name"
-                select-all
-                v-model="users.selected"
-                
                 >
                 <template slot="items" slot-scope="props">
-                <td>
-                  <v-checkbox
-                    primary
-                    hide-details
-                    v-model="props.selected"
-                  ></v-checkbox>
-                </td>              
-                  <td>
-                    <v-avatar size="32">
-                      <img :src="props.item.image" alt="">
-                    </v-avatar> 
-                  </td>
                   <td>{{ props.item.first_name }}</td>
                   <td>{{ props.item.last_name}}</td>
                   <td>{{ props.item.email }}</td>
@@ -159,10 +146,6 @@ export default {
         selected: [],
         userHeaders: [
           {
-            text: 'Image',
-            value: 'image',
-          },
-          {
             text: 'First Name',
             value: 'first_name'
           },
@@ -200,6 +183,10 @@ export default {
         address: '',
         level: 1
       },
+      rules: {
+        required: value => !!value || 'Required.',
+      },
+      userFormValid: false,
       delete_id: null,
       isAdmin: false,
       is_edit: false,

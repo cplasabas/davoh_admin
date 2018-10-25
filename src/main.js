@@ -8,6 +8,7 @@ import 'font-awesome/css/font-awesome.css';
 import './theme/default.styl';
 import VeeValidate from 'vee-validate';
 import Truncate from 'lodash.truncate';
+import money from 'v-money';
 Vue.config.productionTip = false;
 import store from '@/store/store';
 
@@ -16,6 +17,8 @@ import store from '@/store/store';
 Vue.filter('truncate', Truncate);
 Vue.use(VeeValidate, { fieldsBagName: 'formFields' });
 Vue.use(moment);
+
+Vue.use(money, { precision: 2 });
 
 Vue.use(VueCurrencyFilter,
   {

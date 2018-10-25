@@ -18,10 +18,11 @@
                     <v-container grid-list-md>
                       <v-layout wrap>
                         <v-flex xs6 sm6 md6>
-                          <v-text-field v-model="product.code" label="Product Code" hint="*Code of the Product" :rules="[rules.required]" clearable></v-text-field>
+                          <v-text-field prefix="#" v-model="product.code" label="Product Code" hint="*Code of the Product" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
                         <v-flex xs6 sm6>
                           <v-select
+                            prepend-icon="layers"
                             label="Category"
                             required
                             v-model="product.category_id"
@@ -34,10 +35,10 @@
                           clearable ></v-textarea>
                         </v-flex>
                         <v-flex xs12 sm3 md3>
-                          <v-text-field v-model="product_details.gold_weight" label="Gold" hint="*Gold Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
+                          <v-text-field type="number" v-model="product_details.gold_weight" label="Gold" hint="*Gold Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm3 md3>
-                          <v-text-field v-model="product_details.diamond_weight" label="Diamond" hint="*Diamond Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
+                          <v-text-field type="number" v-model="product_details.diamond_weight" label="Diamond" hint="*Diamond Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
                       <!-- <v-flex xs12 sm4 lg4>
                         <v-menu

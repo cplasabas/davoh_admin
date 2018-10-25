@@ -9,63 +9,66 @@
                 add
               </v-btn>
               <v-card>
-                <v-card-title>
-                  <span class="headline" v-if="is_edit">Edit Expense</span>
-                  <span class="headline" v-else>New Expense</span>
-                </v-card-title>
-                <v-divider></v-divider>
-                <v-card-text>
-                  <v-container grid-list-md>
-                    <v-layout wrap>
-                      <v-flex xs12 sm12 md12>
-                        <v-text-field v-model="expense.name" label="Name" hint="Name" required></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm12 md12>
-                        <v-textarea v-model="expense.description" label="Description" hint="Description"
-                        ></v-textarea>
-                      </v-flex>
-                      <v-flex xs6 sm6 lg6>
-                        <v-text-field v-model="expense.amount" label="Amount" value="00.00" prefix="₱"></v-text-field>
-                      </v-flex>
-                      <v-flex xs6 sm4 lg4>
-                        <v-menu
-                          class="pr-2"
-                          ref="statDate"
-                          lazy
-                          :close-on-content-click="false"
-                          v-model="date_menu"
-                          transition="scale-transition"
-                          offset-y
-                          full-width
-                          :nudge-bottom="-22"
-                          max-width="290px"
-                          :return-value.sync="expense.date"
-                        >
-                          <v-text-field
-                            slot="activator"
-                            label="Date"
-                            v-model="expense.date"
-                            append-icon="event"
-                            readonly
-                          ></v-text-field>
-                          <v-date-picker v-model="expense.date" no-title scrollable>
-                            <v-spacer></v-spacer>
-                            <v-btn flat color="primary" @click="date_menu = false">Cancel</v-btn>
-                            <v-btn flat color="primary" @click="$refs.statDate.save(expense.date)">OK</v-btn>
-                          </v-date-picker>
-                        </v-menu>
-                      </v-flex>
-                      
-                    </v-layout>
-                  </v-container>
-                  <small>*indicates required field</small>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                  <v-btn color="primary" v-if="is_edit" flat @click="edit_expense()">EDIT</v-btn>
-                  <v-btn color="primary" v-else flat @click="add_expense()">Add</v-btn>
-                </v-card-actions>
+                <v-form method="post" action="#" id="expenseForm" v-model="expenseFormValid">
+                  <v-card-title>
+                    <span class="headline" v-if="is_edit">Edit Expense</span>
+                    <span class="headline" v-else>New Expense</span>
+                  </v-card-title>
+                  <v-divider></v-divider>
+                  <v-card-text>
+                    <v-container grid-list-md>
+                      <v-layout wrap>
+                        <v-flex xs6 sm6 md6>
+                          <v-text-field prepend-icon="attach_money" v-model="expense.name" label="Name" hint="Name" :rules="[rules.required]" clearable></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-textarea v-model="expense.description" label="Description" hint="Description" clearable
+                          ></v-textarea>
+                        </v-flex>
+                        <v-flex xs6 sm6 lg6>
+                          <v-text-field v-model="expense.amount" label="Amount" value="00.00" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
+                        </v-flex>
+                        <v-flex xs6 sm4 lg4>
+                          <v-menu
+                            class="pr-2"
+                            ref="statDate"
+                            lazy
+                            :close-on-content-click="false"
+                            v-model="date_menu"
+                            transition="scale-transition"
+                            offset-y
+                            full-width
+                            :nudge-bottom="-22"
+                            max-width="290px"
+                            :return-value.sync="expense.date"
+                          >
+                            <v-text-field
+                              slot="activator"
+                              label="Date"
+                              v-model="expense.date"
+                              append-icon="event"
+                              readonly
+                              :rules="[rules.required]"
+                            ></v-text-field>`
+                            <v-date-picker v-model="expense.date" no-title scrollable>
+                              <v-spacer></v-spacer>
+                              <v-btn flat color="primary" @click="date_menu = false">Cancel</v-btn>
+                              <v-btn flat color="primary" @click="$refs.statDate.save(expense.date)">OK</v-btn>
+                            </v-date-picker>
+                          </v-menu>
+                        </v-flex>
+                        
+                      </v-layout>
+                    </v-container>
+                    <small>*indicates required field</small>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
+                    <v-btn color="primary" v-if="is_edit" flat @click="edit_expense()" :disabled="!expenseFormValid">EDIT</v-btn>
+                    <v-btn color="primary" v-else flat @click="add_expense()" :disabled="!expenseFormValid">Add</v-btn>
+                  </v-card-actions>
+                </v-form>
               </v-card>
             </v-dialog>
         </v-flex>
@@ -96,18 +99,8 @@
                 :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
                 class="elevation-1"
                 item-key="name"
-                select-all
-                v-model="expenses.selected"
-                
                 >
-                <template slot="items" slot-scope="props">
-                <td>
-                  <v-checkbox
-                    primary
-                    hide-details
-                    v-model="props.selected"
-                  ></v-checkbox>
-                </td>              
+                <template slot="items" slot-scope="props">             
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description}}</td>
                   <td>{{ props.item.amount | currency }}</td>
@@ -203,6 +196,10 @@ export default {
         amount: 0,
         date: null
       },
+      rules: {
+        required: value => !!value || 'Required.',
+      },
+      expenseFormValid: false,
       is_edit: false,
       delete_id: null,
       edit_id: null,
@@ -247,7 +244,13 @@ export default {
       for (let key in expense[0]) {
         if (expense[0].hasOwnProperty(key)) {
           if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
-            this.expense[key] = expense[0][key];
+            let value = expense[0][key]; 
+
+            if (key === 'date') {
+              value = moment(value).format('MMMM D, YYYY');
+            }
+
+            this.expense[key] = value;
           }
         }
       }

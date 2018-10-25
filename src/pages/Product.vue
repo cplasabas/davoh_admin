@@ -18,6 +18,7 @@
                   <v-layout wrap>
                     <v-flex xs3 sm3 md3 offset-xs9 offset-sm9 offset-md9>
                       <v-select
+                        prepend-icon="assignment"
                         label="Status"
                         required
                         v-model="product_status.status"
@@ -26,10 +27,11 @@
                       ></v-select>
                     </v-flex>
                     <v-flex xs2 sm2 md2>
-                      <v-text-field v-model="product.code" label="Product Code" hint="*Code of the Product" :rules="[rules.required]" clearable></v-text-field>
+                      <v-text-field prefix="#" v-model="product.code" label="Product Code" hint="*Code of the Product" :rules="[rules.required]" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs2 sm2 md2>
                       <v-select
+                        prepend-icon="layers"
                         label="Category"
                         required
                         v-model="product.category_id"
@@ -50,7 +52,7 @@
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field v-model="product_detail.diamond_weight" label="D Weight" hint="Diamond Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
+                      <v-text-field type="number" v-model="product_detail.diamond_weight" label="D Weight" hint="Diamond Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
                       <v-text-field v-if="isAdmin" v-model="product_detail.diamond_party" label="D Party" hint="Diamond Party" clearable></v-text-field>
@@ -59,23 +61,23 @@
                       <v-text-field v-if="isAdmin" v-model="product_detail.diamond_cost" label="D Cost" hint="Diamond Cost" prefix="₱" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field v-if="isAdmin" v-model="product_detail.diamond_size" label="D Size" hint="Diamond Size" clearable></v-text-field>
+                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.diamond_size" label="D Size" hint="Diamond Size" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm12 md12>
                       <div class="headline grey--text text--darken-1">Gold Details</div>
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field v-model="product_detail.gold_weight" label="G Weight" hint="Gold Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
+                      <v-text-field type="number" v-model="product_detail.gold_weight" label="G Weight" hint="Gold Weight" suffix="kg" :rules="[rules.required]" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field v-if="isAdmin" v-model="product_detail.gold_gross_weight" label="G Gross Weight" hint="Gold Gross Weight" suffix="kg" clearable></v-text-field>
+                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.gold_gross_weight" label="G Gross Weight" hint="Gold Gross Weight" suffix="kg" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field v-if="isAdmin" v-model="product_detail.gold_net_weight" label="G Net Weight" hint="Gold Net Weight" suffix="kg" clearable></v-text-field>
+                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.gold_net_weight" label="G Net Weight" hint="Gold Net Weight" suffix="kg" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field v-if="isAdmin" v-model="product_detail.gold_touch" label="G Touch" hint="Gold Touch" suffix="K" clearable></v-text-field>
+                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.gold_touch" label="G Touch" hint="Gold Touch" suffix="K" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
                       <v-text-field v-if="isAdmin" v-model="product_detail.gold_cost" label="G Cost" hint="Gold Cost" prefix="₱" clearable></v-text-field>
@@ -101,7 +103,7 @@
                       <v-text-field v-model="product_status.seller" label="Client" hint="Client" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field v-model="product_status.commission_rate" label="Rate" hint="Rate" suffix="%" clearable></v-text-field>
+                      <v-text-field type="number" v-model="product_status.commission_rate" label="Rate" hint="Rate" suffix="%" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm3 md3>
                       <v-text-field v-model="product_status.commission" label="Commission" hint="Commission" prefix="₱" readonly></v-text-field>
@@ -115,7 +117,7 @@
                       ></v-select>
                     </v-flex>
                     <v-flex xs12 sm3 md3>
-                      <v-text-field v-model="product_status.selling_price" label="Selling Price" hint="Selling Price" prefix="₱"></v-text-field>
+                      <v-text-field v-model="product_status.selling_price" label="Sold Price" hint="Sold Price" prefix="₱"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 lg4>
                       <v-menu
@@ -129,19 +131,19 @@
                         full-width
                         :nudge-bottom="-22"
                         max-width="290px"
-                        :return-value.sync="sold_date"
+                        :return-value.sync="product_status.sold_date"
                       >
                         <v-text-field
                           slot="activator"
                           label="Sold Date"
-                          v-model="sold_date"
+                          v-model="product_status.sold_date"
                           append-icon="event"
                           readonly
                         ></v-text-field>
                         <v-date-picker v-model="sold_date" no-title scrollable>
                           <v-spacer></v-spacer>
                           <v-btn flat color="primary" @click="sold_date_menu = false">Cancel</v-btn>
-                          <v-btn flat color="primary" @click="$refs.statDate.save(sold_date)">OK</v-btn>
+                          <v-btn flat color="primary" @click="$refs.statDate.save(product_status.sold_date)">OK</v-btn>
                         </v-date-picker>
                       </v-menu>
                     </v-flex>
@@ -165,6 +167,7 @@
 import Api from '@/api/api';
 import store from '@/store/store';
 import moment from 'moment';
+import { VMoney } from 'v-money';
 
 export default {
   data () {
@@ -220,6 +223,12 @@ export default {
         required: value => !!value || 'Required.',
       },
       isAdmin: false,
+      money: {
+        decimal: '.',
+        thousands: ',',
+        precision: 2,
+        masked: false /* doesn't work with directive */
+      }
     };
   },
   computed: {
@@ -232,7 +241,7 @@ export default {
   },
   watch: {
     sold_date () {
-      this.product_status.sold_date = moment(this.sold_date).format();
+      this.product_status.sold_date = moment(this.sold_date).format('MMMM D, YYYY');
     },
     commission_rate () {
       if (this.commission_rate) {
@@ -259,7 +268,11 @@ export default {
 
         this.product_status = product.product_status;
         delete product.product_status;
-
+        
+        if(this.product_status.sold_date){
+          this.product_status.sold_date = moment(this.product_status.sold_date).format('MMMM D, YYYY');
+        }
+        
         this.product = product;
       });
     },
@@ -269,7 +282,7 @@ export default {
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };
-
+       
         await Api().put('product/' + this.$route.params.product_id, this.product, config).then(response => {
           this.update_product_details();
         });

@@ -9,30 +9,32 @@
                 add
               </v-btn>
               <v-card>
-                <v-card-title>
-                  <span class="headline">New Category</span>
-                </v-card-title>
-                <v-divider></v-divider>
-                <v-card-text>
-                  <v-container grid-list-md>
-                    <v-layout wrap>
-                      <v-flex xs12 sm12 md12>
-                        <v-text-field v-model="category.name" label="Category Name" hint="Name of the category" required></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm12 md12>
-                        <v-textarea v-model="category.description" label="Description" hint="Description of the category"
-                        ></v-textarea>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                  <small>*indicates required field</small>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                  <v-btn color="primary" v-if="is_edit" flat @click="edit_user()">EDIT</v-btn>
-                  <v-btn color="primary" v-else flat @click="add_category()">Add</v-btn>
-                </v-card-actions>
+                <v-form method="post" action="#" id="prodcutForm" v-model="categoryFormValid">
+                  <v-card-title>
+                    <span class="headline">New Category</span>
+                  </v-card-title>
+                  <v-divider></v-divider>
+                  <v-card-text>
+                    <v-container grid-list-md>
+                      <v-layout wrap>
+                        <v-flex xs6 sm6 md6>
+                          <v-text-field prepend-icon="layers" v-model="category.name" label="Category Name" hint="Name of the category" :rules="[rules.required]" clearable></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-textarea v-model="category.description" label="Description" hint="Description of the category" clearable
+                          ></v-textarea>
+                        </v-flex>
+                      </v-layout>
+                    </v-container>
+                    <small>*indicates required field</small>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
+                    <v-btn color="primary" v-if="is_edit" flat @click="edit_user()" :disabled="!categoryFormValid">EDIT</v-btn>
+                    <v-btn color="primary" v-else flat @click="add_category()" :disabled="!categoryFormValid">Add</v-btn>
+                  </v-card-actions>
+                </v-form>
               </v-card>
             </v-dialog>
         </v-flex>
@@ -63,27 +65,17 @@
                 :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
                 class="elevation-1"
                 item-key="name"
-                select-all
-                v-model="categories.selected"
                 >
-                <template slot="items" slot-scope="props">
-                <td>
-                  <v-checkbox
-                    primary
-                    hide-details
-                    v-model="props.selected"
-                  ></v-checkbox>
-                </td>              
+                <template slot="items" slot-scope="props">             
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description }}</td>
-                  <td>
                   <td class="text-xs-center">
                     <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>create</v-icon>
                     </v-btn>
-                  <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
-                    <v-icon>delete</v-icon>
-                  </v-btn>
+                    <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
+                      <v-icon>delete</v-icon>
+                    </v-btn>
                   </td>
                 </template>
               </v-data-table>
@@ -142,7 +134,8 @@ export default {
           },
           {
             text: 'Actions',
-            value: 'actions'
+            value: 'actions',
+            align: 'center'
           },
         ],
         items: []
@@ -155,6 +148,10 @@ export default {
         name: '',
         description: ''
       },
+      rules: {
+        required: value => !!value || 'Required.',
+      },
+      categoryFormValid: false,
       delete_id: null,
       isAdmin: false,
       is_edit: false,

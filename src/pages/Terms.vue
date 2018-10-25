@@ -9,40 +9,42 @@
                 add
               </v-btn>
               <v-card>
-                <v-card-title>
-                  <span class="headline" v-if="is_edit">Edit Term</span>
-                  <span class="headline" v-else>New Term</span>
-                </v-card-title>
-                <v-divider></v-divider>
-                <v-card-text>
-                  <v-container grid-list-md>
-                    <v-layout wrap>
-                      <v-flex xs12 sm12 md12>
-                        <v-text-field v-model="term.name" label="Name" hint="Name" required></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm12 md12>
-                        <v-textarea v-model="term.description" label="Description" hint="Description"
-                        ></v-textarea>
-                      </v-flex>
-                      <v-flex xs4 sm4 lg4>
-                        <v-text-field v-model="term.months" label="Months" value="0"></v-text-field>
-                      </v-flex>
-                      <v-flex xs4 sm4 lg4>
-                        <v-text-field v-model="term.years" label="Years" value="0"></v-text-field>
-                      </v-flex>
-                       <v-flex xs4 sm4 lg4>
-                        <v-text-field v-model="term.days" label="Days" value="0"></v-text-field>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                  <small>*indicates required field</small>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                  <v-btn color="primary" v-if="is_edit" flat @click="edit_term()">EDIT</v-btn>
-                  <v-btn color="primary" v-else flat @click="add_term()">Add</v-btn>
-                </v-card-actions>
+                <v-form method="post" action="#" id="termForm" v-model="termFormValid">
+                  <v-card-title>
+                    <span class="headline" v-if="is_edit">Edit Term</span>
+                    <span class="headline" v-else>New Term</span>
+                  </v-card-title>
+                  <v-divider></v-divider>
+                  <v-card-text>
+                    <v-container grid-list-md>
+                      <v-layout wrap>
+                        <v-flex xs6 sm6 md6>
+                          <v-text-field prepend-icon="account_balance" v-model="term.name" label="Name" hint="Name" :rules="[rules.required]" clearable></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-textarea v-model="term.description" label="Description" hint="Description" clearable
+                          ></v-textarea>
+                        </v-flex>
+                        <v-flex xs3 sm3 lg3>
+                          <v-text-field prepend-icon="calendar_today" type="number" v-model="term.years" label="Years" value="0"></v-text-field>
+                        </v-flex>
+                        <v-flex xs3 sm3 lg3 offset-xs1 offset-sm1 offset-lg1>
+                          <v-text-field prepend-icon="calendar_today" type="number" v-model="term.months" label="Months" value="0"></v-text-field>
+                        </v-flex>
+                        <v-flex xs3 sm3 lg3 offset-xs2 offset-sm2 offset-lg2>
+                          <v-text-field prepend-icon="calendar_today" type="number" v-model="term.days" label="Days" value="0"></v-text-field>
+                        </v-flex>
+                      </v-layout>
+                    </v-container>
+                    <small>*indicates required field</small>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
+                    <v-btn color="primary" v-if="is_edit" flat @click="edit_term()" :disabled="!termFormValid">EDIT</v-btn>
+                    <v-btn color="primary" v-else flat @click="add_term()" :disabled="!termFormValid">Add</v-btn>
+                  </v-card-actions>
+                </v-form>
               </v-card>
             </v-dialog>
         </v-flex>
@@ -73,18 +75,8 @@
                 :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
                 class="elevation-1"
                 item-key="name"
-                select-all
-                v-model="terms.selected"
-                
                 >
-                <template slot="items" slot-scope="props">
-                <td>
-                  <v-checkbox
-                    primary
-                    hide-details
-                    v-model="props.selected"
-                  ></v-checkbox>
-                </td>              
+                <template slot="items" slot-scope="props">       
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description}}</td>
                   <td>{{ props.item.months }}</td>
@@ -183,6 +175,10 @@ export default {
         years: 0,
         days: 0
       },
+      rules: {
+        required: value => !!value || 'Required.',
+      },
+      termFormValid: false,
       is_edit: false,
       delete_id: null,
       edit_id: null
