@@ -246,6 +246,7 @@ export default {
       },
       delete_id: null,
       productFormValid: false,
+      isAdmin: false,
       rules: {
         required: value => !!value || 'Required.',
       }
@@ -314,6 +315,12 @@ export default {
           headers: { 'Authorization': this.$store.state.token }
         };
 
+        if(this.isAdmin){
+          this.product.status = "Manufactured";
+        }else{
+          this.product.status = "On Hand";
+        }
+
         await Api().post('product', this.product, config).then(response => {
           this.add_product_details(response.data.product.id);
         });
@@ -340,6 +347,12 @@ export default {
   },
   // eslint-disable-next-line
   created: function () {
+    if (store.state.user.level === 0) {
+      this.isAdmin = true;
+    } else {
+      this.isAdmin = false;
+    }
+
     this.get_products();
     this.get_categories();
   },
