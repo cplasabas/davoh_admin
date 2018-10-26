@@ -64,8 +64,8 @@
                 </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                <v-btn color="primary" flat @click="add_product()" :disabled="!productFormValid">Add</v-btn>
+                <v-btn color="primary" flat @click="dialog.show_add = false" :disabled="is_adding">Close</v-btn>
+                <v-btn color="primary" flat @click="add_product()" :disabled="!productFormValid || is_adding">Add</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -158,6 +158,7 @@
 <script>
 import Api from '@/api/api';
 import store from '@/store/store';
+import NProgress from 'nprogress';
 
 export default {
   data () {
@@ -227,6 +228,7 @@ export default {
       imageName: '',
       imageUrl: '',
       product_image: '',
+      is_adding: false,
       rules: {
         required: value => !!value || 'Required.',
       }
@@ -286,6 +288,7 @@ export default {
       this.$router.push('/products/' + product_id);
     },
     get_products () {
+      NProgress.start();
       let config = {
         headers: { 'Authorization': this.$store.state.token }
       };
@@ -309,6 +312,8 @@ export default {
             }
           }
         }
+        NProgress.done();
+        this.is_adding = false;
       });
     },
     get_categories () {
@@ -329,6 +334,8 @@ export default {
     async add_product () { 
 
       try {
+        NProgress.start();
+        this.is_adding = true;
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };

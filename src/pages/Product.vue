@@ -9,26 +9,38 @@
           <dd>
             <div class="body-1 grey--text text--darken-1">{{product.description}}</div>
           </dd>
+          <dd>
+            <v-flex v-if="is_image_add" xs6 md6 lg6 class="text-xs-center text-sm-center text-md-center text-lg-center">
+              <img :src="imageUrl" height="150" v-if="imageUrl"/>
+              <v-text-field label="Upload Image" @click="pickFile" v-model="imageName" prepend-icon="attach_file" :rules="[rules.required]"></v-text-field>
+              <input
+                type="file"
+                style="display: none"
+                ref="image"
+                accept="image/*"
+                @change="onFilePicked"
+              >
+            </v-flex> 
+          </dd>
         </v-flex>     
-        <v-flex v-for="image in product.product_images" :key="image" xs2 md2 lg2>
-          <v-card flat tile>
-            <v-card-media
-              height="150px"
-              width="150px"
-            >
+        <v-flex v-for="(image,key) in product.product_images" :key="key" xs2 md2 lg2>
+          <v-card class="elevation-0 transparent">
+            <v-btn @click="delete_image(image.id)" v-if="is_image_delete" absolute right outline icon fab dark color="pink" small>
+              <v-icon>clear</v-icon>
+            </v-btn>
+            <v-card-media height="150px" width="150px">
               <img :src="image.url" alt="">
-              <v-icon class="mx-auto" size="135">insert_drive_file</v-icon>  
             </v-card-media>
           </v-card>
-        </v-flex>   
+        </v-flex>
+          
         <v-flex lg12 sm12>
           <v-card>
             <v-form method="post" action="#" id="prodcutForm" v-model="productFormValid">
               <v-card-text>
                 <v-container grid-list-md>
                   <v-layout wrap>
-                    
-                    <v-flex xs3 sm3 md3 offset-xs9 offset-sm9 offset-md9>
+                    <v-flex xs3 sm3 md3 offset-xs9 offset-sm9 offset-md9 >
                       <v-select
                         prepend-icon="assignment"
                         label="Status"
@@ -207,6 +219,7 @@ import Api from '@/api/api';
 import store from '@/store/store';
 import moment from 'moment';
 import { VMoney } from 'v-money';
+import NProgress from 'nprogress';
 
 export default {
   data () {
@@ -282,6 +295,12 @@ export default {
       balance: 0,
       interest: 0,
       payment_amount: 0,
+      imageName: '',
+      imageUrl: '',
+      product_image: '',
+      image_count: 0,
+      is_image_add: true,
+      is_image_delete: true,
       money: {
         decimal: '.',
         thousands: ',',
@@ -311,6 +330,20 @@ export default {
     }
   },
   watch: {
+    image_count () {
+      if (this.image_count >= 3) {
+        this.is_image_add = false;
+      } else {
+        this.is_image_add = true;
+      }
+
+      if (this.image_count <= 1) {
+        this.is_image_delete = false;
+      } else {
+        this.is_image_delete = true;
+      }
+
+    },
     sold_date () {
       this.product_status.sold_date = moment(this.sold_date).format('MMMM D, YYYY');
     },
@@ -385,17 +418,88 @@ export default {
       setTimeout(function () {
         let term = this.original_terms.filter(u => u.id === this.product_status.term_id);
 
-        this.due_date = moment(this.product_status.sold_date)
-          .add(term[0].years, 'years')
-          .add(term[0].months, 'months')
-          .add(term[0].days, 'days')
-          .format('MMMM D, YYYY');
-
+        if (term[0]) {
+          this.due_date = moment(this.product_status.sold_date)
+            .add(term[0].years, 'years')
+            .add(term[0].months, 'months')
+            .add(term[0].days, 'days')
+            .format('MMMM D, YYYY');
+        }
+        
       }.bind(this), 100);
     }
   },
   methods: {
+    pickFile () {
+      this.$refs.image.click();
+    },
+    onFilePicked (e) {
+      let files = e.target.files;
+
+      if (files[0] !== undefined) {
+        this.imageName = files[0].name;
+
+        if (this.imageName.lastIndexOf('.') <= 0) {
+          return;
+        }
+
+        const fr = new FileReader();
+        fr.readAsDataURL(files[0]);
+
+        fr.addEventListener('load', () => {
+          this.imageUrl = fr.result;
+          this.product_image = files[0];
+          this.add_product_image();
+        }); 
+
+      } else {
+        this.imageName = '';
+        this.product_image = '';
+        this.imageUrl = '';
+      }
+    },
+    async add_product_image () {
+      try {
+        NProgress.start();
+        let config = {
+          headers: { 
+            'Authorization': this.$store.state.token,
+            'Content-Type': 'multipart/form-data'
+          }
+        };
+
+        let formData = new FormData();
+        formData.append('image', this.product_image);
+
+        await Api().post('product/' + this.product.id + '/image', formData, config).then(response => {
+          this.get_product();
+          this.product_image = '';
+          this.imageName = '';
+          window.getApp.$emit('IMAGE_ADDED_SUCCESS');
+        });
+      } catch (error) { 
+        this.dialog.show_add = false;
+        window.getApp.$emit('IMAGE_ADDED_FAIL');
+      }
+    },
+    async delete_image (id) {
+      try {
+        NProgress.start();
+        let config = {
+          headers: { 'Authorization': this.$store.state.token }
+        };
+
+        await Api().delete('product/' + this.product.id + '/image/' + id, config).then(response => {
+          this.get_product();
+          window.getApp.$emit('IMAGE_DELETED_SUCCESS');
+        });
+      } catch (error) { 
+        this.dialog.show_delete = false;
+        window.getApp.$emit('IMAGE_DELETED_FAIL');
+      }
+    },
     get_product () {
+      NProgress.start();
       let config = {
         headers: { 'Authorization': this.$store.state.token }
       };
@@ -414,11 +518,14 @@ export default {
         }
         
         this.product = product;
+
+        this.image_count = this.product.product_images.length;
+        NProgress.done();
       });
     },
     async update_product () { 
-
       try {
+        NProgress.start();
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };

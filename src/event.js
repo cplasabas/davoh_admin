@@ -121,6 +121,46 @@ export default [
         text: 'Product update fail.'
       };
     }
+  }, 
+  {
+    name: 'IMAGE_ADDED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Image added successfully.'
+      };
+    }
+  },
+  {
+    name: 'IMAGE_ADDED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'Image add fail.'
+      };
+    }
+  },
+  {
+    name: 'IMAGE_DELETED_SUCCESS',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'green',
+        text: 'Image delete successfully.'
+      };
+    }
+  },
+  {
+    name: 'IMAGE_DELETED_FAIL',
+    callback: function (e) {
+      this.snackbar = {
+        show: true,
+        color: 'red',
+        text: 'Image delete fail.'
+      };
+    }
   },
   {
     name: 'EXPENSE_ADDED_SUCCESS',
