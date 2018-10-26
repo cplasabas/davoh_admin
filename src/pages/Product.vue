@@ -2,20 +2,32 @@
   <div id="productView">
     <v-container grid-list-xl fluid>
       <v-layout row wrap>
-         <v-flex sm12>
+         <v-flex sm6>
           <dd>
             <div class="display-3 grey--text text--darken-1">{{product.code}}</div>
           </dd>
           <dd>
-            <div class="caption grey--text text--darken-1">{{product.description}}</div>
+            <div class="body-1 grey--text text--darken-1">{{product.description}}</div>
           </dd>
-        </v-flex>        
+        </v-flex>     
+        <v-flex  v-for="image in product.product_images" :key="image" xs2 md2 lg2>
+          <v-card flat tile>
+            <v-card-media
+              height="150px"
+              width="150px"
+            >
+              <img :src="image.url" alt="">
+              <v-icon class="mx-auto" size="135">insert_drive_file</v-icon>  
+            </v-card-media>
+          </v-card>
+        </v-flex>   
         <v-flex lg12 sm12>
           <v-card>
             <v-form method="post" action="#" id="prodcutForm" v-model="productFormValid">
               <v-card-text>
                 <v-container grid-list-md>
                   <v-layout wrap>
+                    
                     <v-flex xs3 sm3 md3 offset-xs9 offset-sm9 offset-md9>
                       <v-select
                         prepend-icon="assignment"

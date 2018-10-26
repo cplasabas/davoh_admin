@@ -8,6 +8,7 @@ import 'font-awesome/css/font-awesome.css';
 import './theme/default.styl';
 import VeeValidate from 'vee-validate';
 import Truncate from 'lodash.truncate';
+import VueCloudinary from 'vue-cloudinary';
 import money from 'v-money';
 Vue.config.productionTip = false;
 import store from '@/store/store';
@@ -19,6 +20,12 @@ Vue.use(VeeValidate, { fieldsBagName: 'formFields' });
 Vue.use(moment);
 
 Vue.use(money, { precision: 2 });
+
+Vue.use(VueCloudinary, {
+  'cloud_name': 'dtrdp4uus',
+  'api_key': '223544386456498',
+  'api_secret': 'HAc2y3UwfcEWkNhUqecKcAOS4OM',
+});
 
 Vue.use(VueCurrencyFilter,
   {

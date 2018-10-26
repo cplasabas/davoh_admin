@@ -9,14 +9,25 @@
                 add
               </v-btn>
               <v-card>
-                <v-form method="post" action="#" id="prodcutForm" v-model="productFormValid">
-                  <v-card-title>
-                    <span class="headline">New Product</span>
-                  </v-card-title>
-                  <v-divider></v-divider>
-                  <v-card-text>
+                <v-card-title>
+                  <span class="headline">New Product</span>
+                </v-card-title>
+                <v-divider></v-divider>
+                <v-card-text>
+                  <v-form method="post" action="#" id="prodcutForm" v-model="productFormValid">
                     <v-container grid-list-md>
                       <v-layout wrap>
+                        <v-flex xs12 md12 lg12 class="text-xs-center text-sm-center text-md-center text-lg-center">
+                          <img :src="imageUrl" height="150" v-if="imageUrl"/>
+                          <v-text-field label="Select Image" @click="pickFile" v-model="imageName" prepend-icon="attach_file" :rules="[rules.required]"></v-text-field>
+                          <input
+                            type="file"
+                            style="display: none"
+                            ref="image"
+                            accept="image/*"
+                            @change="onFilePicked"
+                          >
+                        </v-flex>
                         <v-flex xs6 sm6 md6>
                           <v-text-field prefix="#" v-model="product.code" label="Product Code" hint="*Code of the Product" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
@@ -43,55 +54,21 @@
                         <v-flex xs12 sm3 md3>
                           <v-text-field type="number" v-model="product_details.diamond_weight" label="Diamond" hint="*Diamond Weight" suffix="ct" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
-                      <!-- <v-flex xs12 sm4 lg4>
-                        <v-menu
-                          class="pr-2"
-                          ref="statDate"
-                          lazy
-                          :close-on-content-click="false"
-                          v-model="manufacture_date_menu"
-                          transition="scale-transition"
-                          offset-y
-                          full-width
-                          :nudge-bottom="-22"
-                          max-width="290px"
-                          :return-value.sync="manufacture_date"
-                        >
-                          <v-text-field
-                            slot="activator"
-                            label="Manufacture Date"
-                            v-model="manufacture_date"
-                            append-icon="event"
-                            readonly
-                          ></v-text-field>
-                          <v-date-picker v-model="manufacture_date" no-title scrollable>
-                            <v-spacer></v-spacer>
-                            <v-btn flat color="primary" @click="manufacture_date_menu = false">Cancel</v-btn>
-                            <v-btn flat color="primary" @click="$refs.statDate.save(manufacture_date)">OK</v-btn>
-                          </v-date-picker>
-                        </v-menu>
-                      </v-flex>
-                      <v-flex xs12 sm4 lg 4>
-                        <v-text-field v-model="product.manufacture_cost" label="Manufacture Cost" value="00.00" prefix="$"></v-text-field>
-                      </v-flex>
-                      <v-flex xs12 sm4 lg 4>
-                        <v-text-field v-model="product.labor" label="Labor" value="00.00" prefix="$"></v-text-field>
-                      </v-flex> -->
                       <v-flex xs4 sm6 lg6>
                         <v-text-field v-model="product.price" label="SRP" hint="*Selling Price" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
                       </v-flex>
                       </v-layout>
                     </v-container>
                     <small>*indicates required field</small>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                    <v-btn color="primary" flat @click="add_product()" :disabled="!productFormValid">Add</v-btn>
-                  </v-card-actions>
-                </v-form>
-              </v-card>
-            </v-dialog>
+                  </v-form>
+                </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
+                <v-btn color="primary" flat @click="add_product()" :disabled="!productFormValid">Add</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-flex>
       </v-layout>
       <v-layout row wrap>
@@ -124,7 +101,7 @@
                 <template slot="items" slot-scope="props">         
                   <td class="text-xs-center">
                     <v-avatar size="32">
-                      <img :src="props.item.image" alt="">
+                      <img :src="props.item.product_images[0].url" alt="">
                     </v-avatar> 
                   </td>
                   <td>{{ props.item.code }}</td>
@@ -247,12 +224,42 @@ export default {
       delete_id: null,
       productFormValid: false,
       isAdmin: false,
+      imageName: '',
+      imageUrl: '',
+      product_image: '',
       rules: {
         required: value => !!value || 'Required.',
       }
     };
   },
   methods: {
+    pickFile () {
+      this.$refs.image.click();
+    },
+    onFilePicked (e) {
+      let files = e.target.files;
+
+      if (files[0] !== undefined) {
+        this.imageName = files[0].name;
+
+        if (this.imageName.lastIndexOf('.') <= 0) {
+          return;
+        }
+
+        const fr = new FileReader();
+        fr.readAsDataURL(files[0]);
+
+        fr.addEventListener('load', () => {
+          this.imageUrl = fr.result;
+          this.product_image = files[0];
+        });
+
+      } else {
+        this.imageName = '';
+        this.product_image = '';
+        this.imageUrl = '';
+      }
+    },
     view_delete (product_id) {
       this.delete_id = product_id;
       this.dialog.show_delete = true;
@@ -284,8 +291,10 @@ export default {
       };
 
       Api().get('product', config).then(response => {
+       
         if (store.state.user.level === 0) {
           this.products.items = response.data.products;
+          
         } else {
           this.products.items = response.data.products.filter(function (product) {
             return product.product_status.status !== 'Manufactured';
@@ -315,12 +324,12 @@ export default {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        if(this.isAdmin){
-          this.product.status = "Manufactured";
-        }else{
-          this.product.status = "On Hand";
+        if (this.isAdmin) {
+          this.product.status = 'Manufactured';
+        } else {
+          this.product.status = 'On Hand';
         }
-
+        
         await Api().post('product', this.product, config).then(response => {
           this.add_product_details(response.data.product.id);
         });
@@ -335,6 +344,26 @@ export default {
           headers: { 'Authorization': this.$store.state.token }
         };
         await Api().put('product_details/' + id, this.product_details, config).then(response => {
+          this.add_product_image(id);
+        });
+      } catch (error) { 
+        this.dialog.show_add = false;
+        window.getApp.$emit('PRODUCT_ADDED_FAIL');
+      }
+    },
+    async add_product_image (id) {
+      try {
+        let config = {
+          headers: { 
+            'Authorization': this.$store.state.token,
+            'Content-Type': 'multipart/form-data'
+          }
+        };
+
+        let formData = new FormData();
+        formData.append('image', this.product_image);
+
+        await Api().post('product/' + id + '/image', formData, config).then(response => {
           this.dialog.show_add = false;
           this.get_products();
           window.getApp.$emit('PRODUCT_ADDED_SUCCESS');
