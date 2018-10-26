@@ -10,7 +10,7 @@
             <div class="body-1 grey--text text--darken-1">{{product.description}}</div>
           </dd>
         </v-flex>     
-        <v-flex  v-for="image in product.product_images" :key="image" xs2 md2 lg2>
+        <v-flex v-for="image in product.product_images" :key="image" xs2 md2 lg2>
           <v-card flat tile>
             <v-card-media
               height="150px"
