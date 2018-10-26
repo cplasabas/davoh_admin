@@ -101,7 +101,7 @@
                 <template slot="items" slot-scope="props">         
                   <td class="text-xs-center">
                     <v-avatar size="32">
-                      <img :src="props.item.product_images[0].url" alt="">
+                      <img :src="props.item.image_url" alt="">
                     </v-avatar> 
                   </td>
                   <td>{{ props.item.code }}</td>
@@ -299,6 +299,15 @@ export default {
           this.products.items = response.data.products.filter(function (product) {
             return product.product_status.status !== 'Manufactured';
           });
+        }
+
+        for (let key in this.products.items) {
+          if (this.products.items.hasOwnProperty(key)) {
+            this.products.items[key].image_url = '';
+            if (this.products.items[key].product_images.length > 0) {
+              this.products.items[key].image_url = this.products.items[key].product_images[0].url;
+            }
+          }
         }
       });
     },
