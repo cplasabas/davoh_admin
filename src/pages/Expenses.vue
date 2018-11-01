@@ -263,7 +263,7 @@ export default {
 
         await Api().delete('expense/' + this.delete_id, config).then(response => {
           this.dialog.show_delete = false;
-          this.get_users();
+          this.get_expenses();
           window.getApp.$emit('EXPENSE_DELETED_SUCCESS');
         });
       } catch (error) { 
