@@ -25,7 +25,7 @@
         </v-flex>     
         <v-flex v-for="(image,key) in product.product_images" :key="key" xs2 md2 lg2>
           <v-card class="elevation-0 transparent">
-            <v-btn @click="delete_image(image.id)" v-if="is_image_delete" absolute right outline icon fab dark color="pink" small>
+            <v-btn @click="show_delete(image.id)" v-if="is_image_delete" absolute right outline icon fab dark color="pink" small>
               <v-icon>clear</v-icon>
             </v-btn>
             <v-card-media height="150px" width="150px">
@@ -225,6 +225,32 @@
               </v-card-actions>   
             </v-form>
           </v-card>
+          <v-dialog v-model="dialog.show_delete" scrollable @keydown.esc="dialog.show_delete = false" persistent max-width="700px">
+            <v-card>
+              <v-card-title>
+                <span class="headline">Delete Product</span>
+              </v-card-title>
+              <v-divider></v-divider>
+              <v-card-text>
+                <v-container grid-list-md>
+                  <p>Are you sure you want to delete the image?</p>
+                </v-container>
+                <div class="text-xs-center">
+                  <div class="v-dialog__container" inset="true" style="display: inline-block;">
+                    <div class="v-dialog__activator">
+                      <button type="button" @click="delete_image()" class="v-btn theme--dark red">
+                        <div class="v-btn__content">Delete</div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" flat @click="dialog.show_delete = false">Close</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-flex>
       </v-layout>
     </v-container>
@@ -359,6 +385,9 @@ export default {
       rules: {
         required: value => !!value || 'Required.',
       },
+      dialog: {
+        show_delete: false
+      },
       is_sold: false,
       is_term: false,
       isAdmin: false,
@@ -374,12 +403,7 @@ export default {
       image_count: 0,
       is_image_add: true,
       is_image_delete: true,
-      money: {
-        decimal: '.',
-        thousands: ',',
-        precision: 2,
-        masked: false /* doesn't work with directive */
-      }
+      delete_id: 0
     };
   },
   computed: {
@@ -598,6 +622,10 @@ export default {
       }
       return value.toFixed(dec).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
     },
+    show_delete (id) {
+      this.delete_id = id;
+      this.dialog.show_delete = true;
+    },
     pickFile () {
       this.$refs.image.click();
     },
@@ -650,15 +678,16 @@ export default {
         window.getApp.$emit('IMAGE_ADDED_FAIL');
       }
     },
-    async delete_image (id) {
+    async delete_image () {
       try {
         NProgress.start();
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        await Api().delete('product/' + this.product.id + '/image/' + id, config).then(response => {
+        await Api().delete('product/' + this.product.id + '/image/' + this.delete_id, config).then(response => {
           this.get_product();
+          this.dialog.show_delete = false;
           window.getApp.$emit('IMAGE_DELETED_SUCCESS');
         });
       } catch (error) { 
