@@ -74,6 +74,7 @@
 <script>
 import adminMenu from '@/api/adminMenu';
 import nonAdminMenu from '@/api/nonAdminMenu';
+import staffMenu from '@/api/staffMenu';
 import store from '@/store/store';
 import VuePerfectScrollbar from 'vue-perfect-scrollbar';
 
@@ -111,8 +112,10 @@ export default {
   created () {
     if (store.state.user.level === 0) {
       this.menus = adminMenu;
-    } else {
+    } else if (store.state.user.level === 1) {
       this.menus = nonAdminMenu;
+    } else {
+      this.menus = staffMenu;
     }
 
     window.getApp.$on('APP_DRAWER_TOGGLED', () => {

@@ -76,13 +76,23 @@
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field type="number" v-model="product_detail.diamond_weight" label="D Weight" hint="Diamond Weight" suffix="ct" :rules="[rules.required]" clearable></v-text-field>
+                      <v-select
+                        label="D Weight"
+                        required
+                        v-model="product_detail.diamond_weight"
+                        :items="diamond_weights"
+                        :rules="[rules.required]"
+                        suffix="ct"
+                      ></v-select>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2>
+                      <v-text-field v-if="isAdmin" v-model="diamondWeightPriceFormatted" label="D Price" hint="Diamond Cost per Carat" prefix="$" clearable></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2>
+                      <v-text-field v-if="isAdmin" v-model="diamondCostFormatted" label="D Total Cost" hint="Diamond Total Cost" prefix="$" readonly></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
                       <v-text-field v-if="isAdmin" v-model="product_detail.diamond_party" label="D Party" hint="Diamond Party" clearable></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm2 md2>
-                      <v-text-field v-if="isAdmin" v-model="product_detail.diamond_cost" label="D Cost" hint="Diamond Cost" prefix="₱" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
                       <v-text-field type="number" v-if="isAdmin" v-model="product_detail.diamond_size" label="D Size" hint="Diamond Size" clearable></v-text-field>
@@ -95,7 +105,14 @@
                       <v-text-field type="number" v-model="product_detail.gold_weight" label="G Weight" hint="Gold Weight" suffix="gm" :rules="[rules.required]" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field type="number" v-model="product_detail.gold_touch" label="G Touch" hint="Gold Touch" suffix="K" clearable></v-text-field>
+                      <v-select
+                        label="Gold Touch"
+                        required
+                        v-model="product_detail.gold_touch"
+                        :items="gold_touches"
+                        :rules="[rules.required]"
+                        suffix="K"
+                      ></v-select>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
                       <v-text-field type="number" v-if="isAdmin" v-model="product_detail.gold_gross_weight" label="G Gross Weight" hint="Gold Gross Weight" suffix="gm" clearable></v-text-field>
@@ -104,20 +121,20 @@
                       <v-text-field type="number" v-if="isAdmin" v-model="product_detail.gold_net_weight" label="G Net Weight" hint="Gold Net Weight" suffix="gm" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field v-if="isAdmin" v-model="product_detail.gold_cost" label="G Cost" hint="Gold Cost" prefix="₱" clearable></v-text-field>
+                      <v-text-field v-if="isAdmin" v-model="goldCostFormatted" label="G Cost" hint="Gold Cost" prefix="₱" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm12 md12>
                       <div class="headline grey--text text--darken-1">Totals</div>
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                      <v-text-field v-if="isAdmin" v-model="product_detail.labor" label="Labor" hint="Labor" prefix="₱" clearable></v-text-field>
+                      <v-text-field v-if="isAdmin" v-model="laborFormatted" label="Labor" hint="Labor" prefix="₱" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                      <v-text-field v-if="isAdmin" v-model="product_detail.manufacture_cost" label="Total Cost" hint="Total Cost" prefix="₱" clearable></v-text-field>
+                      <v-text-field v-if="isAdmin" v-model="manufactureCostFormatted" label="Total Cost" hint="Total Cost" prefix="₱" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                      <v-text-field v-model="product.price" label="SRP" hint="Selling Price" prefix="₱" clearable></v-text-field>
+                      <v-text-field v-model="priceFormatted" label="SRP" hint="Selling Price" prefix="₱" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm12 md12 v-show="is_sold">
                       <div class="display-2 grey--text text--darken-1">Payment Details</div>
@@ -143,13 +160,13 @@
                       ></v-select>
                     </v-flex>
                     <v-flex xs12 sm3 md3 v-show="is_sold">
-                      <v-text-field v-model="product_status.selling_price" label="Sold Price" hint="Sold Price" prefix="₱"></v-text-field>
+                      <v-text-field v-model="soldPriceFormatted" label="Sold Price" hint="Sold Price" prefix="₱"></v-text-field>
                     </v-flex>
                      <v-flex xs12 sm1 md1 v-show="is_sold">
                       <v-text-field type="number" v-model="commission_rate" label="Rate" hint="Rate" suffix="%" readonly></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm3 md3 v-show="is_sold">
-                      <v-text-field v-model="product_status.commission" label="Commission" hint="Commission" prefix="₱" readonly></v-text-field>
+                      <v-text-field v-model="commissionFormatted" label="Commission" hint="Commission" prefix="₱" readonly></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm3 lg3 v-show="is_sold">
                       <v-menu
@@ -184,10 +201,10 @@
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 sm2 md2 v-show="is_sold && is_term">
-                      <v-text-field v-model="product_status.paid" label="Paid" hint="Paid" prefix="₱"></v-text-field>
+                      <v-text-field v-model="paidFormatted" label="Paid" hint="Paid" prefix="₱"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2 v-show="is_sold && is_term">
-                      <v-text-field v-model="balance" label="Balance" hint="Balance" prefix="₱" readonly></v-text-field>
+                      <v-text-field v-model="balanceFormatted" label="Balance" hint="Balance" prefix="₱" readonly></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm1 md1 v-show="is_sold && is_term">
                       <v-text-field type="number" v-model="interest" label="Interest" hint="Interest" suffix="%" readonly></v-text-field>
@@ -218,7 +235,6 @@
 import Api from '@/api/api';
 import store from '@/store/store';
 import moment from 'moment';
-import { VMoney } from 'v-money';
 import NProgress from 'nprogress';
 
 export default {
@@ -227,8 +243,8 @@ export default {
       productFormValid: false,
       status: [
         {
-          text: 'Manufactured',
-          value: 'Manufactured'
+          text: 'Created',
+          value: 'Created'
         },
         {
           text: 'On Hand',
@@ -249,6 +265,62 @@ export default {
           value: 1
         }
       ],
+      diamond_weights: [
+        {
+          text: '1/4',
+          value: 0.25
+        },
+        {
+          text: '1/2',
+          value: 0.5
+        },
+        {
+          text: '3/4',
+          value: 0.75
+        },
+        {
+          text: '1',
+          value: 1
+        },
+        {
+          text: '1 1/4',
+          value: 1.25
+        },
+        {
+          text: '1 1/2',
+          value: 1.5
+        },
+        {
+          text: '1 3/4',
+          value: 1.75
+        },
+        {
+          text: '2',
+          value: 2
+        },
+        {
+          text: '2 1/2',
+          value: 2.5
+        },
+        {
+          text: '3',
+          value: 3
+        }
+      ],
+      gold_touches: [
+        {
+          text: '12',
+          value: 12
+        },
+        {
+          text: '14',
+          value: 14
+        },
+        {
+          text: '18',
+          value: 18
+        }
+      ],
       original_categories: [],
       categories: [],
       original_terms: [],
@@ -264,13 +336,14 @@ export default {
         diamond_cost: 0,
         diamond_size: 0,
         diamond_weight: 0,
+        diamond_weight_price: 0,
         gold_weight: 0,
         gold_gross_weight: 0,
         gold_touch: 0,
         gold_cost: 0,
         labor: 0,
         manufacture_cost: 0,
-        manufacture_date: 0,
+        manufacture_date: null,
       },
       product_status: {
         status: null,
@@ -310,8 +383,94 @@ export default {
     };
   },
   computed: {
+    priceFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.product.price, 0);
+      },
+      set: function (newValue) {
+        this.product.price = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
+    manufactureCostFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.product_detail.manufacture_cost, 0);
+      },
+      set: function (newValue) {
+        this.product_detail.manufacture_cost = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
+    laborFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.product_detail.labor, 0);
+      },
+      set: function (newValue) {
+        this.product_detail.labor = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
+    diamondWeightPriceFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.product_detail.diamond_weight_price, 0);
+      },
+      set: function (newValue) {
+        this.product_detail.diamond_weight_price = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
+    diamondCostFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.product_detail.diamond_cost, 0);
+      },
+      set: function (newValue) {
+        this.product_detail.diamond_cost = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
+    goldCostFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.product_detail.gold_cost, 0);
+      },
+      set: function (newValue) {
+        this.product_detail.gold_cost = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
+    soldPriceFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.product_status.selling_price, 0);
+      },
+      set: function (newValue) {
+        this.product_status.selling_price = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
+    commissionFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.product_status.commission, 0);
+      },
+      set: function (newValue) {
+        this.product_status.commission = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
+    paidFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.product_status.paid, 0);
+      },
+      set: function (newValue) {
+        this.product_status.paid = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
+    balanceFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.balance, 0);
+      },
+      set: function (newValue) {
+        this.balance = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
     product_category () {
       return this.product.category_id;
+    },
+    diamond_weight_price () {
+      return this.product_detail.diamond_weight_price;
+    },
+    diamond_weight () {
+      return this.product_detail.diamond_weight;
     },
     product_price () {
       return this.product_status.selling_price;
@@ -355,10 +514,11 @@ export default {
 
       }.bind(this), 100);
     },
-    commission_rate () {
-      if (this.commission_rate && this.product_status.selling_price) {
-        this.product_status.commission = this.product_status.selling_price * (this.commission_rate / 100);
-      }
+    diamond_weight () {
+      this.product_detail.diamond_cost = this.product_detail.diamond_weight * this.product_detail.diamond_weight_price;
+    },
+    diamondWeightPriceFormatted () {
+      this.product_detail.diamond_cost = this.product_detail.diamond_weight * this.product_detail.diamond_weight_price;
     },
     product_price () {
       if (this.commission_rate && this.product_status.selling_price) {
@@ -375,7 +535,7 @@ export default {
           payment_amount += interest_amount;
         }
 
-        this.payment_amount = payment_amount.toFixed(2);
+        this.payment_amount = this.formatAsCurrency(payment_amount, 0);
       }
     },
     payment_status () {
@@ -430,6 +590,14 @@ export default {
     }
   },
   methods: {
+    formatAsCurrency (value, dec) {
+      dec = dec || 0;
+
+      if (value === null) {
+        return 0;
+      }
+      return value.toFixed(dec).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+    },
     pickFile () {
       this.$refs.image.click();
     },

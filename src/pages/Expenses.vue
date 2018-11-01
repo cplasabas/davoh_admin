@@ -19,16 +19,24 @@
                     <v-container grid-list-md>
                       <v-layout wrap>
                         <v-flex xs6 sm6 md6>
-                          <v-text-field prepend-icon="attach_money" v-model="expense.name" label="Name" hint="Name" :rules="[rules.required]" clearable></v-text-field>
+                          <v-text-field v-model="expense.name" label="Name" hint="Name" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-textarea v-model="expense.description" label="Description" hint="Description" clearable
                           ></v-textarea>
                         </v-flex>
-                        <v-flex xs6 sm6 lg6>
-                          <v-text-field v-model="expense.amount" label="Amount" value="00.00" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
+                        <v-flex xs12 sm4 lg4>
+                          <v-text-field v-model="amountFormatted" label="Amount" value="00.00" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
-                        <v-flex xs6 sm4 lg4>
+                        <v-flex xs12 sm4 md4 v-show="isAdmin">
+                          <v-select
+                            label="Type"
+                            required
+                            v-model="expense.type"
+                            :items="type"
+                          ></v-select>
+                        </v-flex>
+                        <v-flex xs12 sm4 lg4>
                           <v-menu
                             class="pr-2"
                             ref="statDate"
@@ -104,7 +112,8 @@
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description}}</td>
                   <td>{{ props.item.amount | currency }}</td>
-                   <td>{{ props.item.date | moment("MMMM D, YYYY") }}</td>
+                  <td>{{ props.item.date | moment("MMMM D, YYYY") }}</td>
+                  <td>{{ props.item.type_name }}</td>
                   <td class="text-xs-center">
                     <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>create</v-icon>
@@ -151,6 +160,7 @@
 
 <script>
 import Api from '@/api/api';
+import store from '@/store/store';
 import moment from 'moment';
 
 export default {
@@ -177,6 +187,10 @@ export default {
             value: 'date'
           },
           {
+            text: 'Type',
+            value: 'type_name'
+          },
+          {
             text: 'Actions',
             value: 'actions',
             align: 'center'
@@ -184,6 +198,16 @@ export default {
         ],
         items: []
       },
+      type: [
+        {
+          text: 'Admin',
+          value: 0
+        },
+        {
+          text: 'Davoh Store',
+          value: 1
+        }
+      ],
       date_menu: false,
       date: null,
       dialog: { 
@@ -194,6 +218,7 @@ export default {
         name: '',
         description: '',
         amount: 0,
+        type: null,
         date: null
       },
       rules: {
@@ -203,9 +228,28 @@ export default {
       is_edit: false,
       delete_id: null,
       edit_id: null,
+      isAdmin: false
     };
   },
+  computed: {
+    amountFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.expense.amount, 0);
+      },
+      set: function (newValue) {
+        this.expense.amount = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    },
+  },
   methods: {
+    formatAsCurrency (value, dec) {
+      dec = dec || 0;
+
+      if (value === null) {
+        return 0;
+      }
+      return value.toFixed(dec).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+    },
     view_delete (id) {
       this.delete_id = id;
       this.dialog.show_delete = true;
@@ -279,7 +323,24 @@ export default {
       };
 
       Api().get('expense', config).then(response => {
-        this.expenses.items = response.data.expenses;
+        for (let key in response.data.expenses) {
+          if (response.data.expenses.hasOwnProperty(key)) {
+            if (response.data.expenses[key].type === 1) {
+              response.data.expenses[key].type_name = 'Davoh Store';
+            } else {
+              response.data.expenses[key].type_name = 'Admin';
+            }
+          }
+        }
+        let expenses = response.data.expenses;
+
+        if (!this.isAdmin) {
+          expenses = response.data.expenses.filter(function (expense) {
+            return expense.type === 1;
+          });  
+        }
+        
+        this.expenses.items = expenses;
       });
     },
     async add_expense () { 
@@ -302,6 +363,11 @@ export default {
   },
   // eslint-disable-next-line
   created: function () {
+    if (store.state.user.level === 0) {
+      this.isAdmin = true;
+    } else {
+      this.isAdmin = false;
+    }
 
     this.get_expenses();
   },

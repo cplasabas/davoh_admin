@@ -59,7 +59,7 @@ export default [
   },
   {
     path: '/dashboard',
-    meta: { breadcrumb: true, requiresAuth: true },
+    meta: { breadcrumb: true, requiresAuth: true, requiresAdmin: true },
     name: 'Dashboard',
     component: () => import(
       /* webpackChunkName: "routes" */
@@ -99,7 +99,7 @@ export default [
   },
   {
     path: '/reports',
-    meta: { breadcrumb: true, requiresAuth: true },
+    meta: { breadcrumb: true, requiresAuth: true, requiresAdmin: true },
     name: 'Reports',
     component: () => import(
       /* webpackChunkName: "routes" */
@@ -109,7 +109,7 @@ export default [
   },
   {
     path: '/categories',
-    meta: { breadcrumb: true, requiresAuth: true },
+    meta: { breadcrumb: true, requiresAuth: true, requiresAdmin: true },
     name: 'Categories',
     component: () => import(
       /* webpackChunkName: "routes" */
@@ -119,7 +119,7 @@ export default [
   },
   {
     path: '/terms',
-    meta: { breadcrumb: true, requiresAuth: true },
+    meta: { breadcrumb: true, requiresAuth: true, requiresAdmin: true },
     name: 'Terms',
     component: () => import(
       /* webpackChunkName: "routes" */
@@ -129,7 +129,7 @@ export default [
   },
   {
     path: '/Users',
-    meta: { breadcrumb: true, requiresAuth: true },
+    meta: { breadcrumb: true, requiresAuth: true, requiresAdmin: true },
     name: 'Users',
     component: () => import(
       /* webpackChunkName: "routes" */

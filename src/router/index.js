@@ -29,6 +29,19 @@ router.beforeEach((to, from, next) => {
   } else {
     next();
   }
+
+  if (to.meta.requiresAdmin) {
+    if (store.state.user.level === 2) {
+      next({
+        path: '/products'
+      });
+      NProgress.done();
+    } else {
+      next();
+    } 
+  } else {
+    next();
+  }
 });
 
 router.afterEach((to, from) => {

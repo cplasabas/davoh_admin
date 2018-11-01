@@ -45,17 +45,32 @@
                           <v-textarea v-model="product.description" name="description" label="Description" hint="*Description of the product"
                           clearable ></v-textarea>
                         </v-flex>
+                        
                         <v-flex xs12 sm3 md3>
                           <v-text-field type="number" v-model="product_details.gold_weight" label="Gold" hint="*Gold Weight" suffix="gm" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm3 md3>
-                          <v-text-field type="number" v-model="product_details.gold_touch" label="Gold Touch" hint="*Gold Touch" suffix="K" :rules="[rules.required]" clearable></v-text-field>
+                          <v-select
+                            label="Gold Touch"
+                            hint="*Gold Touch"
+                            v-model="product_details.gold_touch"
+                            :items="gold_touches"
+                            :rules="[rules.required]"
+                            suffix="ct"
+                          ></v-select>
                         </v-flex>
                         <v-flex xs12 sm3 md3>
-                          <v-text-field type="number" v-model="product_details.diamond_weight" label="Diamond" hint="*Diamond Weight" suffix="ct" :rules="[rules.required]" clearable></v-text-field>
+                          <v-select
+                            label="Diamond"
+                            hint="*Diamond Weight"
+                            v-model="product_details.diamond_weight"
+                            :items="diamond_weights"
+                            :rules="[rules.required]"
+                            suffix="ct"
+                          ></v-select>
                         </v-flex>
                       <v-flex xs4 sm6 lg6>
-                        <v-text-field v-model="product.price" label="SRP" hint="*Selling Price" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
+                        <v-text-field v-model="priceFormatted" label="SRP" hint="*Selling Price" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
                       </v-flex>
                       </v-layout>
                     </v-container>
@@ -106,7 +121,7 @@
                   </td>
                   <td>{{ props.item.code }}</td>
                   <td>{{ props.item.category.name}}</td>
-                  <td>{{ props.item.product_detail.gold_weight }}gm</td>
+                  <td>{{ props.item.product_detail.gold_weight }}mg</td>
                   <td>{{ props.item.product_detail.gold_touch }}K</td>
                   <td>{{ props.item.product_detail.diamond_weight }}ct</td>
                   <td>{{ props.item.price | currency }}</td>
@@ -178,19 +193,19 @@ export default {
           },
           {
             text: 'Category',
-            value: 'category'
+            value: 'category.name'
           },
           {
             text: 'Gold (gm)',
-            value: 'gold_weight'
+            value: 'product_detail.gold_weight'
           },
           {
             text: 'Gold Touch (K)',
-            value: 'gold_touch'
+            value: 'product_detail.gold_touch'
           },
           {
             text: 'Diamond (ct)',
-            value: 'diamond_weight'
+            value: 'product_detail.diamond_weight'
           },
           {
             text: 'Price',
@@ -198,7 +213,7 @@ export default {
           },
           {
             text: 'Status',
-            value: 'status'
+            value: 'product_status.status'
           },
           {
             text: 'Actions',
@@ -208,6 +223,62 @@ export default {
         ],
         items: []
       },
+      diamond_weights: [
+        {
+          text: '1/4',
+          value: 0.25
+        },
+        {
+          text: '1/2',
+          value: 0.5
+        },
+        {
+          text: '3/4',
+          value: 0.75
+        },
+        {
+          text: '1',
+          value: 1
+        },
+        {
+          text: '1 1/4',
+          value: 1.25
+        },
+        {
+          text: '1 1/2',
+          value: 1.5
+        },
+        {
+          text: '1 3/4',
+          value: 1.75
+        },
+        {
+          text: '2',
+          value: 2
+        },
+        {
+          text: '2 1/2',
+          value: 2.5
+        },
+        {
+          text: '3',
+          value: 3
+        }
+      ],
+      gold_touches: [
+        {
+          text: '12',
+          value: 12
+        },
+        {
+          text: '14',
+          value: 14
+        },
+        {
+          text: '18',
+          value: 18
+        }
+      ],
       dialog: { 
         show_add: false,
         show_delete: false
@@ -234,7 +305,25 @@ export default {
       }
     };
   },
+  computed: {
+    priceFormatted: {
+      get: function () {
+        return this.formatAsCurrency(this.product.price, 0);
+      },
+      set: function (newValue) {
+        this.product.price = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    }
+  },
   methods: {
+    formatAsCurrency (value, dec) {
+      dec = dec || 0;
+
+      if (value === null) {
+        return 0;
+      }
+      return value.toFixed(dec).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+    },
     pickFile () {
       this.$refs.image.click();
     },
@@ -294,13 +383,11 @@ export default {
       };
 
       Api().get('product', config).then(response => {
-       
         if (store.state.user.level === 0) {
           this.products.items = response.data.products;
-          
         } else {
           this.products.items = response.data.products.filter(function (product) {
-            return product.product_status.status !== 'Manufactured';
+            return product.product_status.status !== 'Created';
           });
         }
 
@@ -341,7 +428,7 @@ export default {
         };
 
         if (this.isAdmin) {
-          this.product.status = 'Manufactured';
+          this.product.status = 'Created';
         } else {
           this.product.status = 'On Hand';
         }

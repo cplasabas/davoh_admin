@@ -170,6 +170,7 @@
 
 <script>
 import Api from '@/api/api';
+import store from '@/store/store';
 import moment from 'moment';
 
 export default {
@@ -238,6 +239,7 @@ export default {
       end_date: null,
       end_date_menu: false,
       filterFormValid: false,
+      isAdmin: false,
       rules: {
         required: value => !!value || 'Required.',
       }
@@ -280,12 +282,22 @@ export default {
       };
 
       Api().get('expense', config).then(response => {
-        this.expenses.items = response.data.expenses;
-        this.original_expenses = response.data.expenses;
+        let expenses = response.data.expenses;
 
-        for (let key in response.data.expenses) {
-          if (response.data.expenses.hasOwnProperty(key)) {
-            this.total_expenses = this.total_expenses + response.data.expenses[key].amount;
+        if (!this.isAdmin) {
+          expenses = response.data.expenses.filter(function (expense) {
+            return expense.type === 1;
+          });  
+        }
+
+        this.expenses.items = expenses;
+        this.original_expenses = expenses;
+
+        
+
+        for (let key in expenses) {
+          if (expenses.hasOwnProperty(key)) {
+            this.total_expenses = this.total_expenses + expenses[key].amount;
           }
         }
 
@@ -324,6 +336,11 @@ export default {
   },
   // eslint-disable-next-line
   created: function () {
+    if (store.state.user.level === 0) {
+      this.isAdmin = true;
+    } else {
+      this.isAdmin = false;
+    }
 
     this.get_products();
     this.get_expenses();

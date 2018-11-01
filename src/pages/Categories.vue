@@ -138,7 +138,7 @@ export default {
           },
           {
             text: 'Rate',
-            value: 'rate'
+            value: 'commission_rate'
           },
           {
             text: 'Actions',

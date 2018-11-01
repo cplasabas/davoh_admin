@@ -43,6 +43,15 @@
                           <v-text-field prepend-icon="place" v-model="user.address" label="Address" hint="Address"
                           ></v-text-field>
                         </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <v-select
+                            prepend-icon="fingerprint"
+                            label="Level"
+                            v-model="user.level"
+                            :items="type"
+                            :rules="[rules.required]"
+                          ></v-select>
+                        </v-flex>
                       </v-layout>
                     </v-container>
                     <small>*indicates required field</small>
@@ -90,6 +99,7 @@
                   <td>{{ props.item.last_name}}</td>
                   <td>{{ props.item.email }}</td>
                   <td>{{ props.item.contact }}</td>
+                  <td>{{ props.item.type_name }}</td>
                   <td class="text-xs-center">
                     <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>create</v-icon>
@@ -162,6 +172,10 @@ export default {
             value: 'contact'
           },
           {
+            text: 'Level',
+            value: 'type_name'
+          },
+          {
             text: 'Actions',
             value: 'actions',
             align: 'center'
@@ -169,6 +183,16 @@ export default {
         ],
         items: []
       },
+      type: [
+        {
+          text: 'Admin',
+          value: 1
+        },
+        {
+          text: 'Staff',
+          value: 2
+        },
+      ],
       dialog: { 
         show_add: false,
         show_delete: false
@@ -269,7 +293,20 @@ export default {
       };
 
       Api().get('user', config).then(response => {
-        this.users.items = response.data.users.filter(u => u.level !== 0);
+
+        let users = response.data.users.filter(u => u.level !== 0);
+
+        for (let key in users) {
+          if (users.hasOwnProperty(key)) {
+            if (users[key].level === 1) {
+              users[key].type_name = 'Admin';
+            } else if (users[key].level === 2) {
+              users[key].type_name = 'Staff';
+            }
+          }
+        }
+       
+        this.users.items = users;
       });
     },
     async add_user () { 
