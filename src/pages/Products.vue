@@ -60,14 +60,7 @@
                           ></v-select>
                         </v-flex>
                         <v-flex xs12 sm3 md3>
-                          <v-select
-                            label="Diamond"
-                            hint="*Diamond Weight"
-                            v-model="product_details.diamond_weight"
-                            :items="diamond_weights"
-                            :rules="[rules.required]"
-                            suffix="ct"
-                          ></v-select>
+                          <v-text-field type="number" v-if="isAdmin" v-model="product_details.diamond_weight" label="Diamond" hint="Diamond Weight" suffix="ct" clearable></v-text-field>
                         </v-flex>
                       <v-flex xs4 sm6 lg6>
                         <v-text-field v-model="priceFormatted" label="SRP" hint="*Selling Price" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
@@ -223,48 +216,48 @@ export default {
         ],
         items: []
       },
-      diamond_weights: [
-        {
-          text: '1/4',
-          value: 0.25
-        },
-        {
-          text: '1/2',
-          value: 0.5
-        },
-        {
-          text: '3/4',
-          value: 0.75
-        },
-        {
-          text: '1',
-          value: 1
-        },
-        {
-          text: '1 1/4',
-          value: 1.25
-        },
-        {
-          text: '1 1/2',
-          value: 1.5
-        },
-        {
-          text: '1 3/4',
-          value: 1.75
-        },
-        {
-          text: '2',
-          value: 2
-        },
-        {
-          text: '2 1/2',
-          value: 2.5
-        },
-        {
-          text: '3',
-          value: 3
-        }
-      ],
+      // diamond_weights: [
+      //   {
+      //     text: '1/4',
+      //     value: 0.25
+      //   },
+      //   {
+      //     text: '1/2',
+      //     value: 0.5
+      //   },
+      //   {
+      //     text: '3/4',
+      //     value: 0.75
+      //   },
+      //   {
+      //     text: '1',
+      //     value: 1
+      //   },
+      //   {
+      //     text: '1 1/4',
+      //     value: 1.25
+      //   },
+      //   {
+      //     text: '1 1/2',
+      //     value: 1.5
+      //   },
+      //   {
+      //     text: '1 3/4',
+      //     value: 1.75
+      //   },
+      //   {
+      //     text: '2',
+      //     value: 2
+      //   },
+      //   {
+      //     text: '2 1/2',
+      //     value: 2.5
+      //   },
+      //   {
+      //     text: '3',
+      //     value: 3
+      //   }
+      // ],
       gold_touches: [
         {
           text: '12',
