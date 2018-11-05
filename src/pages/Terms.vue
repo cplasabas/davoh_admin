@@ -26,7 +26,7 @@
                           ></v-textarea>
                         </v-flex>
                         <v-flex xs12 sm3 md3>
-                          <v-text-field type="number" v-model="term.interest" label="Interest" hint="Interest" suffix="%" clearable></v-text-field>
+                          <v-text-field type="number" v-model="term.interest" label="Interest" hint="Interest" suffix="%" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
                         <v-flex xs3 sm3 lg3>
                           <v-text-field prepend-icon="calendar_today" type="number" v-model="term.years" label="Years" value="0"></v-text-field>

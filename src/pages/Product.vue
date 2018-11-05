@@ -10,17 +10,12 @@
             <div class="body-1 grey--text text--darken-1">{{product.description}}</div>
           </dd>
           <dd>
-            <v-flex v-if="is_image_add" xs6 md6 lg6 class="text-xs-center text-sm-center text-md-center text-lg-center">
-              <img :src="imageUrl" height="150" v-if="imageUrl"/>
-              <v-text-field label="Upload Image" @click="pickFile" v-model="imageName" prepend-icon="attach_file" :rules="[rules.required]"></v-text-field>
-              <input
-                type="file"
-                style="display: none"
-                ref="image"
-                accept="image/*"
-                @change="onFilePicked"
-              >
-            </v-flex> 
+            <v-flex >
+              <v-btn  v-if="is_image_add" @click="show_upload()" color="primary" right>
+                Upload Image
+                <v-icon right dark>cloud_upload</v-icon>
+              </v-btn>
+            </v-flex>
           </dd>
         </v-flex>     
         <v-flex v-for="(image,key) in product.product_images" :key="key" xs2 md2 lg2>
@@ -244,6 +239,39 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+          <v-dialog v-model="dialog.show_upload" scrollable persistent max-width="700px">
+            <v-card>
+              <v-card-title>
+                <span class="headline">Upload Image</span>
+              </v-card-title>
+              <v-divider></v-divider>
+              <v-card-text>
+                <v-container grid-list-md>
+                  <p>Select an image you want to upload?</p>
+                </v-container>
+                <div class="text-xs-center">
+                  <div class="v-dialog__container" inset="true" style="display: inline-block;">
+                    <div class="v-dialog__activator">
+                      <img :src="imageUrl" height="150" v-if="imageUrl"/>
+                      <v-text-field label="Image" @click="pickFile" v-model="imageName" prepend-icon="attach_file"></v-text-field>
+                      <input
+                        type="file"
+                        style="display: none"
+                        ref="image"
+                        accept="image/*"
+                        @change="onFilePicked"
+                      >
+                    </div>
+                  </div>
+                </div>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" flat @click="dialog.show_upload = false" :disabled="is_image_uploading">Close</v-btn>
+                <v-btn color="primary" flat @click="upload_image()" :disabled="is_image_uploading">Upload</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-flex>
       </v-layout>
     </v-container>
@@ -284,48 +312,6 @@ export default {
           value: 1
         }
       ],
-      // diamond_weights: [
-      //   {
-      //     text: '1/4',
-      //     value: 0.25
-      //   },
-      //   {
-      //     text: '1/2',
-      //     value: 0.5
-      //   },
-      //   {
-      //     text: '3/4',
-      //     value: 0.75
-      //   },
-      //   {
-      //     text: '1',
-      //     value: 1
-      //   },
-      //   {
-      //     text: '1 1/4',
-      //     value: 1.25
-      //   },
-      //   {
-      //     text: '1 1/2',
-      //     value: 1.5
-      //   },
-      //   {
-      //     text: '1 3/4',
-      //     value: 1.75
-      //   },
-      //   {
-      //     text: '2',
-      //     value: 2
-      //   },
-      //   {
-      //     text: '2 1/2',
-      //     value: 2.5
-      //   },
-      //   {
-      //     text: '3',
-      //     value: 3
-      //   }
-      // ],
       gold_touches: [
         {
           text: '12',
@@ -379,7 +365,8 @@ export default {
         required: value => !!value || 'Required.',
       },
       dialog: {
-        show_delete: false
+        show_delete: false,
+        show_upload: false
       },
       is_sold: false,
       is_term: false,
@@ -396,6 +383,7 @@ export default {
       image_count: 0,
       is_image_add: true,
       is_image_delete: true,
+      is_image_uploading: false,
       delete_id: 0
     };
   },
@@ -615,9 +603,16 @@ export default {
       }
       return value.toFixed(dec).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
     },
+    show_upload (id) {
+      this.dialog.show_upload = true;
+    },
     show_delete (id) {
       this.delete_id = id;
       this.dialog.show_delete = true;
+    },
+    upload_image (id) {
+      this.is_image_uploading = true;
+      this.add_product_image();
     },
     pickFile () {
       this.$refs.image.click();
@@ -638,7 +633,6 @@ export default {
         fr.addEventListener('load', () => {
           this.imageUrl = fr.result;
           this.product_image = files[0];
-          this.add_product_image();
         }); 
 
       } else {
@@ -649,6 +643,7 @@ export default {
     },
     async add_product_image () {
       try {
+        this.is_image_uploading = true;
         NProgress.start();
         let config = {
           headers: { 
@@ -661,13 +656,15 @@ export default {
         formData.append('image', this.product_image);
 
         await Api().post('product/' + this.product.id + '/image', formData, config).then(response => {
+          this.is_image_uploading = false;
+          this.dialog.show_upload = false;
           this.get_product();
           this.product_image = '';
           this.imageName = '';
           window.getApp.$emit('IMAGE_ADDED_SUCCESS');
         });
       } catch (error) { 
-        this.dialog.show_add = false;
+        this.is_image_uploading = false;
         window.getApp.$emit('IMAGE_ADDED_FAIL');
       }
     },
