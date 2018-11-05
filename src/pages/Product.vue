@@ -11,7 +11,7 @@
           </dd>
           <dd>
             <v-flex >
-              <v-btn  v-if="is_image_add" @click="show_upload()" color="primary" right>
+              <v-btn v-if="is_image_add" @click="show_upload()" color="primary" right>
                 Upload Image
                 <v-icon right dark>cloud_upload</v-icon>
               </v-btn>
