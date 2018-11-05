@@ -39,7 +39,6 @@
                       <v-select
                         prepend-icon="assignment"
                         label="Status"
-                        required
                         v-model="product_status.status"
                         :items="status"
                         :rules="[rules.required]"
@@ -52,7 +51,6 @@
                       <v-select
                         prepend-icon="layers"
                         label="Category"
-                        required
                         v-model="product.category_id"
                         :items="categories"
                         :rules="[rules.required]"
@@ -71,7 +69,7 @@
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.diamond_weight" label="D Weight" hint="Diamond Weight" suffix="ct" clearable></v-text-field>
+                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.diamond_weight" label="D Weight" hint="Diamond Weight" suffix="ct" :rules="[rules.required]" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
                       <v-text-field v-if="isAdmin" v-model="diamondWeightPriceFormatted" label="D Price" hint="Diamond Cost per Carat" prefix="$" clearable></v-text-field>
@@ -98,7 +96,6 @@
                         required
                         v-model="product_detail.gold_touch"
                         :items="gold_touches"
-                        :rules="[rules.required]"
                         suffix="K"
                       ></v-select>
                     </v-flex>
