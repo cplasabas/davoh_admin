@@ -228,7 +228,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'green',
-        text: 'category added successfully.'
+        text: 'Category added successfully.'
       };
     }
   },
@@ -238,7 +238,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'red',
-        text: 'category add fail.'
+        text: 'Category add fail.'
       };
     }
   },
@@ -248,7 +248,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'green',
-        text: 'category delete successfully.'
+        text: 'Category delete successfully.'
       };
     }
   },
@@ -258,7 +258,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'red',
-        text: 'category delete fail.'
+        text: 'Category delete fail.'
       };
     }
   },
@@ -268,7 +268,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'green',
-        text: 'category edit successfully.'
+        text: 'Category edit successfully.'
       };
     }
   },
@@ -278,7 +278,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'red',
-        text: 'category edit fail.'
+        text: 'Category edit fail.'
       };
     }
   },
@@ -318,7 +318,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'red',
-        text: 'Ter, delete fail.'
+        text: 'Term delete fail.'
       };
     }
   },
@@ -338,7 +338,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'red',
-        text: 'TERM edited fail.'
+        text: 'Term edited fail.'
       };
     }
   },
@@ -348,7 +348,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'green',
-        text: 'user added successfully.'
+        text: 'User added successfully.'
       };
     }
   },
@@ -358,7 +358,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'red',
-        text: 'user add fail.'
+        text: 'User add fail.'
       };
     }
   },
@@ -368,7 +368,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'green',
-        text: 'user delete successfully.'
+        text: 'User delete successfully.'
       };
     }
   },
@@ -378,7 +378,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'red',
-        text: 'user delete fail.'
+        text: 'User delete fail.'
       };
     }
   },
@@ -388,7 +388,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'green',
-        text: 'user edit successfully.'
+        text: 'User edit successfully.'
       };
     }
   },
@@ -398,7 +398,7 @@ export default [
       this.snackbar = {
         show: true,
         color: 'red',
-        text: 'user edit fail.'
+        text: 'User edit fail.'
       };
     }
   }

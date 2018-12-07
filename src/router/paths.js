@@ -88,6 +88,16 @@ export default [
     )
   },
   {
+    path: '/customers',
+    meta: { breadcrumb: true, requiresAuth: true },
+    name: 'Customers',
+    component: () => import(
+      /* webpackChunkName: "routes" */
+      /* webpackMode: "lazy-once" */
+      `@/pages/Customers.vue`
+    )
+  },
+  {
     path: '/expenses',
     meta: { breadcrumb: true, requiresAuth: true },
     name: 'Expenses',

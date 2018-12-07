@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     token: null,
     isUserLogged: false,
-    user: []
+    user: [],
+    page: null
   },
   mutations: {
     setToken (state, token) {
@@ -21,6 +22,9 @@ export default new Vuex.Store({
     },
     setUser (state, user) {
       state.user = user;
+    },
+    setPage (state, page) {
+      state.page = page;
     }
   },
   getters: {
@@ -35,5 +39,8 @@ export default new Vuex.Store({
     setUser ({ commit }, user) {
       commit('setUser', user);
     },
+    setPage ({ commit }, page) {
+      commit('setPage', page);
+    }
   }
 });

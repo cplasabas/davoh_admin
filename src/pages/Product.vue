@@ -125,8 +125,13 @@
                       <div class="display-2 grey--text text--darken-1">Payment Details</div>
                       <v-divider></v-divider>
                     </v-flex>
-                    <v-flex xs12 sm4 md4 v-show="is_sold">
-                      <v-text-field v-model="product_status.seller" label="Client" hint="Client" clearable></v-text-field>
+                    <v-flex xs3 sm3 md3 v-show="is_sold">
+                      <v-select
+                        label="Client"
+                        required
+                        v-model="product_status.customer_id"
+                        :items="customers"
+                      ></v-select>
                     </v-flex>
                     <v-flex xs3 sm3 md3 v-show="is_sold">
                       <v-select
@@ -327,6 +332,8 @@ export default {
       categories: [],
       original_terms: [],
       terms: [],
+      original_customers: [],
+      customers: [],
       product: {
         code: '',
         description: '',
@@ -488,6 +495,9 @@ export default {
     },
     payment_paid () {
       return this.product_status.paid;
+    },
+    payment_type () {
+      return this.product_status.type;
     }
   },
   watch: {
@@ -511,9 +521,45 @@ export default {
     product_category () {
       setTimeout(function () {
         let category = this.original_categories.filter(u => u.id === this.product.category_id);
+        
+        let commission_rate = category[0].commission_rate;
 
-        this.commission_rate = category[0].commission_rate;
+        if (this.product_status.type === 1) {
+          commission_rate *= 2;
+        } 
+        
+        this.commission_rate = commission_rate;
 
+      }.bind(this), 100);
+    },
+    payment_type () {
+      setTimeout(function () {
+        let category = this.original_categories.filter(u => u.id === this.product.category_id);
+          
+        let commission_rate = category[0].commission_rate;
+
+        if (this.product_status.type === 1) {
+          commission_rate *= 2;
+        }
+        
+        this.commission_rate = commission_rate;
+
+        if (this.commission_rate && this.product_status.selling_price) {
+          this.product_status.commission = this.product_status.selling_price * (this.commission_rate / 100);
+          
+          let term = this.original_terms.filter(u => u.id === this.product_status.term_id);
+
+          let days = term[0].days + (term[0].months * 30) + ((term[0].years * 12) * 30);
+
+          let payment_amount = this.product_status.selling_price / days;
+
+          if (term[0].interest) {
+            let interest_amount = payment_amount * (term[0].interest / 100);
+            payment_amount += interest_amount;
+          }
+
+          this.payment_amount = this.formatAsCurrency(payment_amount, 0);
+        }
       }.bind(this), 100);
     },
     diamond_weight () {
@@ -531,7 +577,7 @@ export default {
         let days = term[0].days + (term[0].months * 30) + ((term[0].years * 12) * 30);
 
         let payment_amount = this.product_status.selling_price / days;
-
+        
         if (term[0].interest) {
           let interest_amount = payment_amount * (term[0].interest / 100);
           payment_amount += interest_amount;
@@ -780,6 +826,22 @@ export default {
         });
       });
     },
+    get_terms () {
+      let config = {
+        headers: { 'Authorization': this.$store.state.token }
+      };
+
+      Api().get('customer', config).then(response => {
+        this.original_customers = response.data.customers;
+        response.data.customers.map((val) => {
+          this.customers.push({
+            text: val.name,
+            value: val.id
+          });
+          return true;
+        });
+      });
+    },
   },
   // eslint-disable-next-line
   created: function () {
@@ -793,6 +855,7 @@ export default {
     this.get_product();
     this.get_categories();
     this.get_terms();
+    this.get_customers();
   },
 };
 </script>

@@ -101,8 +101,9 @@
               <v-data-table
                 :headers="products.headers"
                 :search="search"
-                :items="products.items"
-                :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
+                :pagination.sync="pagination"
+                :items="products.items" 
+                :rows-per-page-items="[5]"
                 class="elevation-1"
                 item-key="name"              
                 >
@@ -173,6 +174,7 @@ export default {
     return {
       search: '',
       categories: [],
+      pagination: {},
       products: {
         headers: [
           {
@@ -216,48 +218,6 @@ export default {
         ],
         items: []
       },
-      // diamond_weights: [
-      //   {
-      //     text: '1/4',
-      //     value: 0.25
-      //   },
-      //   {
-      //     text: '1/2',
-      //     value: 0.5
-      //   },
-      //   {
-      //     text: '3/4',
-      //     value: 0.75
-      //   },
-      //   {
-      //     text: '1',
-      //     value: 1
-      //   },
-      //   {
-      //     text: '1 1/4',
-      //     value: 1.25
-      //   },
-      //   {
-      //     text: '1 1/2',
-      //     value: 1.5
-      //   },
-      //   {
-      //     text: '1 3/4',
-      //     value: 1.75
-      //   },
-      //   {
-      //     text: '2',
-      //     value: 2
-      //   },
-      //   {
-      //     text: '2 1/2',
-      //     value: 2.5
-      //   },
-      //   {
-      //     text: '3',
-      //     value: 3
-      //   }
-      // ],
       gold_touches: [
         {
           text: '12',
@@ -306,6 +266,11 @@ export default {
       set: function (newValue) {
         this.product.price = Number(newValue.replace(/[^0-9\.]/g, ''));
       }
+    }
+  },
+  mounted: function () {
+    if (store.state.page) {
+      this.pagination.page = store.state.page;
     }
   },
   methods: {
@@ -364,9 +329,10 @@ export default {
         this.dialog.show_delete = false;
         window.getApp.$emit('PRODUCT_DELETED_FAIL');
       }
-
+      
     },
     view_product (product_id) {
+      this.$store.dispatch('setPage', this.pagination.page);
       this.$router.push('/products/' + product_id);
     },
     get_products () {

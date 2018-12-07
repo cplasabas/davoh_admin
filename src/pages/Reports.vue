@@ -89,7 +89,7 @@
                       :headers="sales.headers"
                       :search="search"
                       :items="sales.items"
-                      :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
+                      :rows-per-page-items="[5]"
                       class="elevation-1"
                       item-key="name"              
                       >
@@ -115,7 +115,7 @@
                       :headers="expenses.headers"
                       :search="search"
                       :items="expenses.items"
-                      :rows-per-page-items="[10,25,50,{text:'All','value':-1}]"
+                      :rows-per-page-items="[5]"
                       class="elevation-1"
                       item-key="name"              
                       >

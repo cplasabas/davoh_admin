@@ -6,6 +6,12 @@ const menu = [
     name: 'Products',
   },
   {
+    title: 'Customers',
+    group: 'default',
+    icon: 'face',
+    name: 'Customers',
+  },
+  {
     title: 'Expenses',
     group: 'default',
     icon: 'attach_money',
