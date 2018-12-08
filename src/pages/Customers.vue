@@ -239,7 +239,7 @@ export default {
     };
   },
   methods: {
-    view_products (id){
+    view_products (id) {
       this.customer_products.items = this.products.filter(u => u.product_status.customer_id === id);
       this.dialog.show_products = true;
     },

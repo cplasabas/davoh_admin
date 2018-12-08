@@ -826,7 +826,7 @@ export default {
         });
       });
     },
-    get_terms () {
+    get_customers () {
       let config = {
         headers: { 'Authorization': this.$store.state.token }
       };

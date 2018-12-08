@@ -153,6 +153,7 @@ export default {
       Util.toggleFullScreen();
     }
   },
+  // eslint-disable-next-line
   created: function () {
     this.user = store.state.user;
   }
