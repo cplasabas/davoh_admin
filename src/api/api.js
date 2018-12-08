@@ -2,6 +2,6 @@ import axios from 'axios';
 
 export default () => {
   return axios.create({
-    baseURL: 'https://206.189.89.72:8010'
+    baseURL: 'https://api.davohjewelryco.com:8010/'
   });
 };
