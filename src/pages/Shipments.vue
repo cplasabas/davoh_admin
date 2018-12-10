@@ -10,27 +10,47 @@
               </v-btn>
               <v-card>
                 <v-card-title>
-                  <span class="headline">New Customer</span>
+                  <span class="headline">New Shipment</span>
                 </v-card-title>
                 <v-divider></v-divider>
                 <v-card-text>
-                  <v-form method="post" action="#" id="customerForm" v-model="customerFormValid">
+                  <v-form method="post" action="#" id="shipmentForm" v-model="shipmentFormValid">
                     <v-container grid-list-md>
                       <v-layout wrap>
-                        <v-flex xs12 sm12 md12>
-                          <v-text-field prepend-icon="perm_identity" v-model="customer.name" label="Name" hint="Name" :rules="[rules.required]"></v-text-field>
+                        <v-flex xs4 sm4 md4>
+                          <v-text-field prefix="#" v-model="shipment.code" label="Code" hint="Code of the Shipment" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
-                        <v-flex xs12 sm12 md12>
-                          <v-text-field prepend-icon="mail_outline" v-model="customer.email" label="Email" hint="Email"
-                          ></v-text-field>
+                        <v-flex xs8 sm8 md8>
+                          <v-text-field prepend-icon="perm_identity" v-model="shipment.name" label="Name" hint="Name" :rules="[rules.required]"></v-text-field>
                         </v-flex>
-                        <v-flex xs12 sm12 md12>
-                          <v-text-field prepend-icon="phone" v-model="customer.contact" label="Contact" hint="Contact"
-                          ></v-text-field>
-                        </v-flex>
-                        <v-flex xs12 sm12 md12>
-                          <v-text-field prepend-icon="place" v-model="customer.address" label="Address" hint="Address"
-                          ></v-text-field>
+                        <v-flex xs12 sm4 lg4>
+                          <v-menu
+                            class="pr-2"
+                            ref="statDate"
+                            lazy
+                            :close-on-content-click="false"
+                            v-model="date_menu"
+                            transition="scale-transition"
+                            offset-y
+                            full-width
+                            :nudge-bottom="-22"
+                            max-width="290px"
+                            :return-value.sync="shipment.date"
+                          >
+                            <v-text-field
+                              slot="activator"
+                              label="Date"
+                              v-model="shipment.date"
+                              append-icon="event"
+                              readonly
+                              :rules="[rules.required]"
+                            ></v-text-field>`
+                            <v-date-picker v-model="shipment.date" no-title scrollable>
+                              <v-spacer></v-spacer>
+                              <v-btn flat color="primary" @click="date_menu = false">Cancel</v-btn>
+                              <v-btn flat color="primary" @click="$refs.statDate.save(shipment.date)">OK</v-btn>
+                            </v-date-picker>
+                          </v-menu>
                         </v-flex>
                       </v-layout>
                     </v-container>
@@ -40,8 +60,8 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="primary" flat @click="dialog.show_add = false">Close</v-btn>
-                  <v-btn color="primary" v-if="is_edit" flat @click="edit_customer()" :disabled="!customerFormValid">EDIT</v-btn>
-                  <v-btn color="primary" v-else flat @click="add_customer()" :disabled="!customerFormValid">Add</v-btn>
+                  <v-btn color="primary" v-if="is_edit" flat @click="edit_shipment()" :disabled="!shipmentFormValid">EDIT</v-btn>
+                  <v-btn color="primary" v-else flat @click="add_shipment()" :disabled="!shipmentFormValid">Add</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -67,18 +87,17 @@
             <v-divider></v-divider>
             <v-card-text class="pa-0">
               <v-data-table
-                :headers="customers.customerHeaders"
+                :headers="shipments.shipmentHeaders"
                 :search="search"
-                :items="customers.items"
+                :items="shipments.items"
                 :rows-per-page-items="[5,{text:'All','value':-1}]"
                 class="elevation-1"
                 item-key="name"
                 >
                 <template slot="items" slot-scope="props">
+                  <td>{{ props.item.code }}</td>
                   <td>{{ props.item.name }}</td>
-                  <td>{{ props.item.email }}</td>
-                  <td>{{ props.item.contact }}</td> 
-                  <td>{{ props.item.address }}</td> 
+                  <td>{{ props.item.date | moment("MMMM D, YYYY") }}</td> 
                   <td class="text-xs-center">
                     <v-btn @click="view_products(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>remove_red_eye</v-icon>
@@ -97,14 +116,14 @@
           <v-dialog v-model="dialog.show_products" scrollable @keydown.esc="dialog.show_products = false" persistent max-width="700px">
             <v-card>
               <v-card-title>
-                <span class="headline">Customer products</span>
+                <span class="headline">shipment products</span>
               </v-card-title>
               <v-divider></v-divider>
               <v-card-text>
                 <v-data-table
-                  :headers="customer_products.headers"
+                  :headers="shipment_products.headers"
                   :search="search"
-                  :items="customer_products.items" 
+                  :items="shipment_products.items" 
                   :rows-per-page-items="[5]"
                   class="elevation-1"
                   item-key="name"              
@@ -135,17 +154,17 @@
           <v-dialog v-model="dialog.show_delete" scrollable @keydown.esc="dialog.show_delete = false" persistent max-width="700px">
             <v-card>
               <v-card-title>
-                <span class="headline">Delete Customer</span>
+                <span class="headline">Delete shipment</span>
               </v-card-title>
               <v-divider></v-divider>
               <v-card-text>
                 <v-container grid-list-md>
-                  <p>Are you sure you want to delete the customer?</p>
+                  <p>Are you sure you want to delete the shipment?</p>
                 </v-container>
                 <div class="text-xs-center">
                   <div class="v-dialog__container" inset="true" style="display: inline-block;">
                     <div class="v-dialog__activator">
-                      <button type="button" @click="delete_customer()" class="v-btn theme--dark red">
+                      <button type="button" @click="delete_shipment()" class="v-btn theme--dark red">
                         <div class="v-btn__content">Delete</div>
                       </button>
                     </div>
@@ -172,24 +191,20 @@ export default {
   data () {
     return {
       search: '',
-      customers: {
+      shipments: {
         selected: [],
-        customerHeaders: [
+        shipmentHeaders: [
+          {
+            text: 'Code',
+            value: 'code'
+          },
           {
             text: 'Name',
             value: 'name'
           },
           {
-            text: 'Email',
-            value: 'email'
-          },
-          {
-            text: 'Contact',
-            value: 'contact'
-          },
-          {
-            text: 'Address',
-            value: 'address'
+            text: 'Date',
+            value: 'date'
           },
           {
             text: 'Actions',
@@ -204,14 +219,14 @@ export default {
         show_delete: false,
         show_products: false
       },
-      customer: {
+      date_menu: false,
+      date: null,
+      shipment: {
         name: '',
-        email: '',
-        contact: '',
-        address: '',
+        date: null
       },
       products: [],
-      customer_products: {
+      shipment_products: {
         headers: [
           {
             text: 'Image',
@@ -241,7 +256,7 @@ export default {
       rules: {
         required: value => !!value || 'Required.',
       },
-      customerFormValid: false,
+      shipmentFormValid: false,
       delete_id: null,
       is_edit: false,
       edit_id: null
@@ -249,13 +264,13 @@ export default {
   },
   methods: {
     view_products (id) {
-      this.customer_products.items = this.products.filter(u => u.product_status.customer_id === id);
+      this.shipment_products.items = this.products.filter(u => u.shipment_id === id);
 
-      for (let key in this.customer_products.items) {
-        if (this.customer_products.items.hasOwnProperty(key)) {
-          this.customer_products.items[key].image_url = '';
-          if (this.customer_products.items[key].product_images.length > 0) {
-            this.customer_products.items[key].image_url = this.customer_products.items[key].product_images[0].url;
+      for (let key in this.shipment_products.items) {
+        if (this.shipment_products.items.hasOwnProperty(key)) {
+          this.shipment_products.items[key].image_url = '';
+          if (this.shipment_products.items[key].product_images.length > 0) {
+            this.shipment_products.items[key].image_url = this.shipment_products.items[key].product_images[0].url;
           }
         } 
       }
@@ -269,21 +284,21 @@ export default {
       this.delete_id = id;
       this.dialog.show_delete = true;
     },
-    async delete_customer () {
+    async delete_shipment () {
 
       try {
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        await Api().delete('customer/' + this.delete_id, config).then(response => {
+        await Api().delete('shipment/' + this.delete_id, config).then(response => {
           this.dialog.show_delete = false;
-          this.get_customers();
-          window.getApp.$emit('CUSTOMER_DELETED_SUCCESS');
+          this.get_shipments();
+          window.getApp.$emit('shipment_DELETED_SUCCESS');
         });
       } catch (error) { 
         this.dialog.show_delete = false;
-        window.getApp.$emit('CUSTOMER_DELETED_FAIL');
+        window.getApp.$emit('shipment_DELETED_FAIL');
       }
 
     },
@@ -292,9 +307,9 @@ export default {
       this.dialog.show_add = true;
       this.is_edit = false;
 
-      for (let key in this.customer) {
-        if (this.customer.hasOwnProperty(key)) {
-          this.customer[key] = '';
+      for (let key in this.shipment) {
+        if (this.shipment.hasOwnProperty(key)) {
+          this.shipment[key] = '';
         }
       }
     },
@@ -303,59 +318,59 @@ export default {
       this.edit_id = id;
       this.is_edit = true;
 
-      let customer = this.customers.items.filter(u => u.id === id);
+      let shipment = this.shipments.items.filter(u => u.id === id);
       
-      for (let key in customer[0]) {
-        if (customer[0].hasOwnProperty(key)) {
+      for (let key in shipment[0]) {
+        if (shipment[0].hasOwnProperty(key)) {
           if (key !== 'id' && key !== 'createdAt' && key !== 'updatedAt') {
-            this.customer[key] = customer[0][key];
+            this.shipment[key] = shipment[0][key];
           }
         }
       }
     },
-    async edit_customer () {
+    async edit_shipment () {
       try {
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        await Api().put('customer/' + this.edit_id, this.customer, config).then(response => {
+        await Api().put('shipment/' + this.edit_id, this.shipment, config).then(response => {
           this.dialog.show_add = false;
-          this.get_customers();
-          window.getApp.$emit('CUSTOMER_EDIT_SUCCESS');
+          this.get_shipments();
+          window.getApp.$emit('shipment_EDIT_SUCCESS');
         });
       } catch (error) { 
         this.dialog.show_add = false;
-        window.getApp.$emit('CUSTOMER_EDIT_FAIL');
+        window.getApp.$emit('shipment_EDIT_FAIL');
       }
     },
-    get_customers () {
+    get_shipments () {
       let config = {
         headers: { 'Authorization': this.$store.state.token }
       };
 
-      Api().get('customer', config).then(response => {
+      Api().get('shipment', config).then(response => {
 
-        let customers = response.data.customers;
+        let shipments = response.data.shipments;
        
-        this.customers.items = customers;
+        this.shipments.items = shipments;
       });
     },
-    async add_customer () { 
+    async add_shipment () { 
 
       try {
         let config = {
           headers: { 'Authorization': this.$store.state.token }
         };
 
-        await Api().post('customer', this.customer, config).then(response => {
+        await Api().post('shipment', this.shipment, config).then(response => {
           this.dialog.show_add = false;
-          this.get_customers();
-          window.getApp.$emit('CUSTOMER_ADDED_SUCCESS');
+          this.get_shipments();
+          window.getApp.$emit('shipment_ADDED_SUCCESS');
         });
       } catch (error) { 
         this.dialog.show_add = false;
-        window.getApp.$emit('CUSTOMER_ADDED_FAIL');
+        window.getApp.$emit('shipment_ADDED_FAIL');
       }
     },
     get_products () {
@@ -365,16 +380,14 @@ export default {
       };
 
       Api().get('product', config).then(response => {
-        this.products = response.data.products.filter(function (product) {
-          return product.product_status.status === 'Sold';
-        });
+        this.products = response.data.products;
       });
     },
   },
   // eslint-disable-next-line
   created: function () {
 
-    this.get_customers();
+    this.get_shipments();
     this.get_products();
   },
 };

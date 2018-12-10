@@ -18,24 +18,18 @@
                   <v-card-text>
                     <v-container grid-list-md>
                       <v-layout wrap>
-                        <v-flex xs6 sm6 md6>
+                        <v-flex xs4 sm4 md4>
                           <v-text-field prepend-icon="account_balance" v-model="term.name" label="Name" hint="Name" :rules="[rules.required]" clearable></v-text-field>
+                        </v-flex>
+                        <v-flex xs3 sm3 lg3 offset-xs-1 offset-sm1 offset-xs1>
+                          <v-text-field prepend-icon="calendar_today" type="number" v-model="term.days" label="Days" value="0"></v-text-field>
+                        </v-flex>
+                        <v-flex xs12 sm2 md2 offset-xs-1 offset-sm1 offset-xs1>
+                          <v-text-field type="number" v-model="term.interest" label="Interest" hint="Interest" suffix="%"  readonly></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-textarea v-model="term.description" label="Description" hint="Description" clearable
                           ></v-textarea>
-                        </v-flex>
-                        <v-flex xs12 sm3 md3>
-                          <v-text-field type="number" v-model="term.interest" label="Interest" hint="Interest" suffix="%" :rules="[rules.required]" clearable></v-text-field>
-                        </v-flex>
-                        <v-flex xs3 sm3 lg3>
-                          <v-text-field prepend-icon="calendar_today" type="number" v-model="term.years" label="Years" value="0"></v-text-field>
-                        </v-flex>
-                        <v-flex xs3 sm3 lg3>
-                          <v-text-field prepend-icon="calendar_today" type="number" v-model="term.months" label="Months" value="0"></v-text-field>
-                        </v-flex>
-                        <v-flex xs3 sm3 lg3>
-                          <v-text-field prepend-icon="calendar_today" type="number" v-model="term.days" label="Days" value="0"></v-text-field>
                         </v-flex>
                       </v-layout>
                     </v-container>
@@ -82,10 +76,8 @@
                 <template slot="items" slot-scope="props">       
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description}}</td>
-                  <td>{{ props.item.interest }}</td>
-                  <td>{{ props.item.years }}</td>
-                  <td>{{ props.item.months }}</td>
                   <td>{{ props.item.days }}</td>
+                  <td>{{ props.item.interest }}</td>
                   <td class="text-xs-center">
                     <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>create</v-icon>
@@ -149,20 +141,12 @@ export default {
             value: 'description'
           },
           {
-            text: 'Interest (%)',
-            value: 'interest'
-          },
-          {
-            text: 'Years',
-            value: 'years'
-          },
-          {
-            text: 'Months',
-            value: 'months'
-          },
-          {
             text: 'Days',
             value: 'days'
+          },
+          {
+            text: 'Interest (%)',
+            value: 'interest'
           },
           {
             text: 'Actions',
@@ -179,8 +163,7 @@ export default {
       term: {
         name: '',
         description: '',
-        months: 0,
-        years: 0,
+        interest: 0,
         days: 0
       },
       rules: {
@@ -192,7 +175,22 @@ export default {
       edit_id: null
     };
   },
+  computed: {
+    days () {
+      return this.term.days;
+    }
+  },
+  watch: {
+    days () {
+      this.compute_interest();
+    }
+  },
   methods: {
+    compute_interest (){
+      let amount = this.term.days/30;
+
+      this.term.interest = (amount * 5).toFixed(2);
+    },
     view_delete (id) {
       this.delete_id = id;
       this.dialog.show_delete = true;

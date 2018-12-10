@@ -49,10 +49,28 @@
                     </v-flex>
                     <v-flex xs2 sm3 md3>
                       <v-select
-                        prepend-icon="layers"
+                        prepend-icon="local_offer"
                         label="Category"
                         v-model="product.category_id"
                         :items="categories"
+                        :rules="[rules.required]"
+                      ></v-select>
+                    </v-flex>
+                    <v-flex xs2 sm3 md3>
+                      <v-select
+                        prepend-icon="layers"
+                        label="Supplier"
+                        v-model="product.supplier_id"
+                        :items="suppliers"
+                        :rules="[rules.required]"
+                      ></v-select>
+                    </v-flex>
+                    <v-flex xs2 sm3 md3>
+                      <v-select
+                        prepend-icon="local_shipping"
+                        label="Shipment Code"
+                        v-model="product.shipment_id"
+                        :items="shipments"
                         :rules="[rules.required]"
                       ></v-select>
                     </v-flex>
@@ -141,7 +159,17 @@
                         :items="type"
                       ></v-select>
                     </v-flex>
-                    <v-flex xs3 sm3 md3 v-show="is_sold">
+                    <v-flex xs3 sm3 md3 v-show="is_sold && show_agent">
+                      <v-select
+                        label="Agent"
+                        required
+                        v-model="product_status.agent_id"
+                        :items="agents"
+                      ></v-select>
+                    </v-flex>
+                    <v-flex xs12 sm12 md12 v-show="is_sold">
+                    </v-flex>
+                    <v-flex xs3 sm2 md2 v-show="is_sold">
                       <v-select
                         label="Term"
                         required
@@ -292,10 +320,6 @@ export default {
       productFormValid: false,
       status: [
         {
-          text: 'Created',
-          value: 'Created'
-        },
-        {
           text: 'On Hand',
           value: 'On Hand'
         },
@@ -334,6 +358,13 @@ export default {
       terms: [],
       original_customers: [],
       customers: [],
+      original_agents: [],
+      agents: [],
+      original_suppliers: [],
+      suppliers: [],
+      original_shipments: [],
+      shipments: [],
+      shipments: [],
       product: {
         code: '',
         description: '',
@@ -358,6 +389,8 @@ export default {
         status: null,
         seller: null,
         selling_price: 0,
+        customer_id: 0,
+        agent_id: 0,
         commission: 0,
         sold_date: 0,
         term_id: null,
@@ -372,6 +405,7 @@ export default {
         show_delete: false,
         show_upload: false
       },
+      show_agent: false,
       is_sold: false,
       is_term: false,
       isAdmin: false,
@@ -540,6 +574,10 @@ export default {
 
         if (this.product_status.type === 1) {
           commission_rate *= 2;
+          this.show_agent = true;
+        }else{
+          this.show_agent = false;
+          this.product_status.agent_id = 0;
         }
         
         this.commission_rate = commission_rate;
@@ -549,7 +587,7 @@ export default {
           
           let term = this.original_terms.filter(u => u.id === this.product_status.term_id);
 
-          let days = term[0].days + (term[0].months * 30) + ((term[0].years * 12) * 30);
+          let days = term[0].days;
 
           let payment_amount = this.product_status.selling_price / days;
 
@@ -574,7 +612,7 @@ export default {
         
         let term = this.original_terms.filter(u => u.id === this.product_status.term_id);
 
-        let days = term[0].days + (term[0].months * 30) + ((term[0].years * 12) * 30);
+        let days = term[0].days;
 
         let payment_amount = this.product_status.selling_price / days;
         
@@ -601,7 +639,7 @@ export default {
           this.interest = term[0].interest;
           this.is_term = true;
 
-          let days = term[0].days + (term[0].months * 30) + ((term[0].years * 12) * 30);
+          let days = term[0].days;
 
           let payment_amount = this.product_status.selling_price / days;
 
@@ -697,7 +735,7 @@ export default {
 
         let formData = new FormData();
         formData.append('image', this.product_image);
-
+  
         await Api().post('product/' + this.product.id + '/image', formData, config).then(response => {
           this.is_image_uploading = false;
           this.dialog.show_upload = false;
@@ -841,6 +879,51 @@ export default {
           return true;
         });
       });
+    },get_agents () {
+      let config = {
+        headers: { 'Authorization': this.$store.state.token }
+      };
+
+      Api().get('agent', config).then(response => {
+        this.original_agents = response.data.agents;
+        response.data.agents.map((val) => {
+          this.agents.push({
+            text: val.name,
+            value: val.id
+          });
+          return true;
+        });
+      });
+    },get_suppliers () {
+      let config = {
+        headers: { 'Authorization': this.$store.state.token }
+      };
+
+      Api().get('supplier', config).then(response => {
+        this.original_suppliers = response.data.suppliers;
+        response.data.suppliers.map((val) => {
+          this.suppliers.push({
+            text: val.name,
+            value: val.id
+          });
+          return true;
+        });
+      });
+    },get_shipments () {
+      let config = {
+        headers: { 'Authorization': this.$store.state.token }
+      };
+
+      Api().get('shipment', config).then(response => {
+        this.original_shipemnts = response.data.shipments;
+        response.data.shipments.map((val) => {
+          this.shipments.push({
+            text: val.code,
+            value: val.id
+          });
+          return true;
+        });
+      });
     },
   },
   // eslint-disable-next-line
@@ -856,6 +939,9 @@ export default {
     this.get_categories();
     this.get_terms();
     this.get_customers();
+    this.get_agents();
+    this.get_suppliers();
+    this.get_shipments();
   },
 };
 </script>

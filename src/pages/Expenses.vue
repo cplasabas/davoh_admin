@@ -200,12 +200,20 @@ export default {
       },
       type: [
         {
-          text: 'Admin',
+          text: 'Personal',
           value: 0
         },
         {
-          text: 'Davoh Store',
+          text: 'Davoh PH',
           value: 1
+        },
+        {
+          text: 'Davoh Mumbai',
+          value: 2
+        },
+        {
+          text: 'Lotus Pharma',
+          value: 3
         }
       ],
       date_menu: false,
@@ -325,10 +333,14 @@ export default {
       Api().get('expense', config).then(response => {
         for (let key in response.data.expenses) {
           if (response.data.expenses.hasOwnProperty(key)) {
-            if (response.data.expenses[key].type === 1) {
-              response.data.expenses[key].type_name = 'Davoh Store';
-            } else {
-              response.data.expenses[key].type_name = 'Admin';
+            if (response.data.expenses[key].type === 0) {
+              response.data.expenses[key].type_name = 'Personal';
+            } else if (response.data.expenses[key].type === 1) {
+              response.data.expenses[key].type_name = 'Davoh PH';
+            } else if (response.data.expenses[key].type === 2) {
+              response.data.expenses[key].type_name = 'Davoh Mumbai';
+            } else if (response.data.expenses[key].type === 3) {
+              response.data.expenses[key].type_name = 'Lotus Pharma';
             }
           }
         }

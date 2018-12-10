@@ -96,8 +96,8 @@
                       <template slot="items" slot-scope="props">         
                         <td>{{ props.item.code }}</td>
                         <td class="text-xs-center">{{ props.item.product_status.seller}}</td>
-                        <td class="text-xs-center">{{ props.item.product_status.commission | currency }}</td>
                         <td class="text-xs-center">{{ moment(props.item.product_status.sold_date).format('MMMM DD, YYYY')}}</td>
+                        <td class="text-xs-center">{{ props.item.product_status.commission | currency }}</td>
                         <td class="text-xs-right">{{ props.item.product_status.selling_price | currency }}</td>
                       </template>
                     </v-data-table>
@@ -193,20 +193,20 @@ export default {
             align: 'center'
           },
           {
-            text: 'Commission',
-            value: 'commission',
+            text: 'Sold Date',
+            value: 'date',
             align: 'center'
           },
           {
-            text: 'Date',
-            value: 'date',
+            text: 'Commission',
+            value: 'commission',
             align: 'center'
           },
           {
             text: 'Amount',
             value: 'amount',
             align: 'right'
-          }
+          },
         ],
         items: []
       },
@@ -332,7 +332,7 @@ export default {
         }
         return false;
       }.bind(this));
-    }
+    },
   },
   // eslint-disable-next-line
   created: function () {

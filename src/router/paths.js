@@ -88,6 +88,36 @@ export default [
     )
   },
   {
+    path: '/agents',
+    meta: { breadcrumb: true, requiresAuth: true },
+    name: 'Agents',
+    component: () => import(
+      /* webpackChunkName: "routes" */
+      /* webpackMode: "lazy-once" */
+      `@/pages/Agents.vue`
+    )
+  },
+  {
+    path: '/suppliers',
+    meta: { breadcrumb: true, requiresAuth: true },
+    name: 'Suppliers',
+    component: () => import(
+      /* webpackChunkName: "routes" */
+      /* webpackMode: "lazy-once" */
+      `@/pages/Suppliers.vue`
+    )
+  },
+  {
+    path: '/shipments',
+    meta: { breadcrumb: true, requiresAuth: true },
+    name: 'Shipments',
+    component: () => import(
+      /* webpackChunkName: "routes" */
+      /* webpackMode: "lazy-once" */
+      `@/pages/Shipments.vue`
+    )
+  },
+  {
     path: '/customers',
     meta: { breadcrumb: true, requiresAuth: true },
     name: 'Customers',
