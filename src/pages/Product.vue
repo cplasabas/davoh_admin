@@ -364,7 +364,6 @@ export default {
       suppliers: [],
       original_shipments: [],
       shipments: [],
-      shipments: [],
       product: {
         code: '',
         description: '',
@@ -575,7 +574,7 @@ export default {
         if (this.product_status.type === 1) {
           commission_rate *= 2;
           this.show_agent = true;
-        }else{
+        } else {
           this.show_agent = false;
           this.product_status.agent_id = 0;
         }
@@ -879,7 +878,8 @@ export default {
           return true;
         });
       });
-    },get_agents () {
+    },
+    get_agents () {
       let config = {
         headers: { 'Authorization': this.$store.state.token }
       };
@@ -894,7 +894,8 @@ export default {
           return true;
         });
       });
-    },get_suppliers () {
+    },
+    get_suppliers () {
       let config = {
         headers: { 'Authorization': this.$store.state.token }
       };
@@ -909,7 +910,8 @@ export default {
           return true;
         });
       });
-    },get_shipments () {
+    },
+    get_shipments () {
       let config = {
         headers: { 'Authorization': this.$store.state.token }
       };

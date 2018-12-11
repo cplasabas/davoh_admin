@@ -25,7 +25,7 @@
                           <v-text-field prepend-icon="calendar_today" type="number" v-model="term.days" label="Days" value="0"></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm2 md2 offset-xs-1 offset-sm1 offset-xs1>
-                          <v-text-field type="number" v-model="term.interest" label="Interest" hint="Interest" suffix="%"  readonly></v-text-field>
+                          <v-text-field type="number" v-model="term.interest" label="Interest" hint="Interest" suffix="%" readonly></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-textarea v-model="term.description" label="Description" hint="Description" clearable
@@ -186,8 +186,8 @@ export default {
     }
   },
   methods: {
-    compute_interest (){
-      let amount = this.term.days/30;
+    compute_interest () {
+      let amount = this.term.days / 30;
 
       this.term.interest = (amount * 5).toFixed(2);
     },

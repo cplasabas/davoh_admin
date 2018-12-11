@@ -80,6 +80,17 @@
         </v-flex>
       </v-layout>
       <v-layout row wrap>
+        <v-flex xs2 sm2>
+          <v-select
+            prepend-icon="filter_list"
+            label="Status"
+            required
+            v-model="product_status_filter"
+            :items="product_status"
+          ></v-select>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
         <v-flex lg12>
           <v-card>
             <v-toolbar card color="white">
@@ -175,6 +186,7 @@ export default {
       search: '',
       categories: [],
       pagination: {},
+      original_products: [],
       products: {
         headers: [
           {
@@ -232,6 +244,21 @@ export default {
           value: 18
         }
       ],
+      product_status: [
+        {
+          text: 'All',
+          value: 0
+        },
+        {
+          text: 'On Hand',
+          value: 1
+        },
+        {
+          text: 'Sold',
+          value: 2
+        }
+      ],
+      product_status_filter: 0,
       dialog: { 
         show_add: false,
         show_delete: false
@@ -265,6 +292,17 @@ export default {
       },
       set: function (newValue) {
         this.product.price = Number(newValue.replace(/[^0-9\.]/g, ''));
+      }
+    }
+  },
+  watch: {
+    product_status_filter: function (val) {
+      this.products.items = this.original_products;
+
+      if (val === 1) {
+        this.products.items = this.original_products.filter(u => u.product_status.status === 'On Hand');
+      } else if (val === 2) {
+        this.products.items = this.original_products.filter(u => u.product_status.status === 'Sold');
       }
     }
   },
@@ -358,6 +396,7 @@ export default {
             }
           }
         }
+        this.original_products = this.products.items;
         NProgress.done();
         this.is_adding = false;
       });
