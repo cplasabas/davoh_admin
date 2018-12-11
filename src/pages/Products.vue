@@ -1,6 +1,7 @@
 <template>
   <div id="pageTable">
     <v-container grid-list-xl fluid>
+
       <v-layout row wrap justify-end>
         <v-flex lg2 >
             <v-dialog v-model="dialog.show_add" scrollable @keydown.esc="dialog.show_add = false" persistent max-width="700px">
@@ -89,6 +90,11 @@
             :items="product_status"
           ></v-select>
         </v-flex>
+         <v-flex xs2 sm2>
+          <v-btn color="primary" @click="setPage()" dark slot="activator">
+            SET
+          </v-btn>
+        </v-flex>       
       </v-layout>
       <v-layout row wrap>
         <v-flex lg12>
@@ -116,7 +122,7 @@
                 :items="products.items" 
                 :rows-per-page-items="[5]"
                 class="elevation-1"
-                item-key="name"              
+                item-key="name"             
                 >
                 <template slot="items" slot-scope="props">         
                   <td class="text-xs-center">
@@ -273,6 +279,7 @@ export default {
         gold_weight: null,
         diamond_weight: null
       },
+      page_number: null,
       delete_id: null,
       productFormValid: false,
       isAdmin: false,
@@ -306,12 +313,13 @@ export default {
       }
     }
   },
-  mounted: function () {
-    if (store.state.page) {
-      this.pagination.page = store.state.page;
-    }
-  },
   methods: {
+    setPage () {
+      if (store.state.page) {
+        this.pagination.page = store.state.page;  
+        this.$store.dispatch('setPage', null);
+      }
+    },
     formatAsCurrency (value, dec) {
       dec = dec || 0;
 
@@ -485,6 +493,7 @@ export default {
 
     this.get_products();
     this.get_categories();
+    
   },
 };
 </script>
