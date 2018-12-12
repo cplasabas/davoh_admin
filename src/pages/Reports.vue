@@ -2,6 +2,9 @@
   <div id="pageTable">
     <v-container grid-list-xl fluid>
       <v-layout row wrap>
+        <v-flex xs6 sm6 md6>
+          <div class="headline grey--text text--darken-1">Report for the month of {{current_month}}</div>
+        </v-flex>
         <v-flex lg12>
           <v-flex xs12 sm12 md12>
             <v-form method="post" action="#" id="prodcutForm" v-model="filterFormValid">
@@ -180,6 +183,7 @@ export default {
       search: '',
       original_sales: [],
       original_expenses: [],
+      current_month: '',
       sales: {
         selected: [],
         headers: [
@@ -263,9 +267,13 @@ export default {
         let sales = response.data.products.filter(function (product) {
           if (product.product_status.status === 'Sold') {
            
-            this.gross_income = this.gross_income + product.product_status.selling_price;
-            this.total_commission = this.total_commission + product.product_status.commission;
-            return product;
+            let date = moment(product.product_status.sold_date);
+
+            if (date.isBetween(this.start_date, this.end_date) || date.isSame(this.start_date) || date.isSame(this.end_date)) {
+              this.gross_income = this.gross_income + product.product_status.selling_price;
+              this.total_commission = this.total_commission + product.product_status.commission;
+              return product;
+            }
           }
 
           return false;
@@ -293,13 +301,16 @@ export default {
         this.expenses.items = expenses;
         this.original_expenses = expenses;
 
-        
+        this.expenses.items = this.original_expenses.filter(function (expense) {
+  
+          let date = moment(expense.date);
 
-        for (let key in expenses) {
-          if (expenses.hasOwnProperty(key)) {
-            this.total_expenses = this.total_expenses + expenses[key].amount;
+          if (date.isBetween(this.start_date, this.end_date) || date.isSame(this.start_date) || date.isSame(this.end_date)) {
+            this.total_expenses = this.total_expenses + expense.amount;
+            return expense;
           }
-        }
+          return false;
+        }.bind(this));
 
       });
     },
@@ -307,6 +318,7 @@ export default {
       this.net_income = this.gross_income - (this.total_expenses + this.total_commission);
     },
     filter_report () {
+
       this.gross_income = 0;
       this.total_commission = 0;
       this.total_expenses = 0;
@@ -341,6 +353,10 @@ export default {
     } else {
       this.isAdmin = false;
     }
+
+    this.current_month = moment().format('MMMM');
+    this.start_date = moment().startOf('month').format('YYYY-MM-DD');
+    this.end_date = moment().endOf('month').format('YYYY-MM-DD');
 
     this.get_products();
     this.get_expenses();

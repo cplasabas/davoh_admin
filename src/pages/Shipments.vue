@@ -20,8 +20,14 @@
                         <v-flex xs4 sm4 md4>
                           <v-text-field prefix="#" v-model="shipment.code" label="Code" hint="Code of the Shipment" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
-                        <v-flex xs8 sm8 md8>
-                          <v-text-field prepend-icon="perm_identity" v-model="shipment.name" label="Name" hint="Name" :rules="[rules.required]"></v-text-field>
+                        <v-flex xs2 sm3 md3>
+                          <v-select
+                            prepend-icon="layers"
+                            label="Supplier"
+                            v-model="shipment.supplier_id"
+                            :items="suppliers"
+                            :rules="[rules.required]"
+                          ></v-select>
                         </v-flex>
                         <v-flex xs12 sm4 lg4>
                           <v-menu
@@ -96,7 +102,7 @@
                 >
                 <template slot="items" slot-scope="props">
                   <td>{{ props.item.code }}</td>
-                  <td>{{ props.item.name }}</td>
+                  <td>{{ props.item.supplier.name }}</td>
                   <td>{{ props.item.date | moment("MMMM D, YYYY") }}</td> 
                   <td class="text-xs-center">
                     <v-btn @click="view_products(props.item.id)" depressed outline icon fab dark color="green" small>
@@ -199,8 +205,8 @@ export default {
             value: 'code'
           },
           {
-            text: 'Name',
-            value: 'name'
+            text: 'Supplier',
+            value: 'supplier'
           },
           {
             text: 'Date',
@@ -226,6 +232,7 @@ export default {
         date: null
       },
       products: [],
+      suppliers: [],
       shipment_products: {
         headers: [
           {
@@ -350,7 +357,6 @@ export default {
       };
 
       Api().get('shipment', config).then(response => {
-
         let shipments = response.data.shipments;
        
         this.shipments.items = shipments;
@@ -383,12 +389,29 @@ export default {
         this.products = response.data.products;
       });
     },
+    get_suppliers () {
+      let config = {
+        headers: { 'Authorization': this.$store.state.token }
+      };
+
+      Api().get('supplier', config).then(response => {
+
+        response.data.suppliers.map((val) => {
+          this.suppliers.push({
+            text: val.name,
+            value: val.id
+          });
+          return true;
+        });
+      });
+    },
   },
   // eslint-disable-next-line
   created: function () {
 
     this.get_shipments();
     this.get_products();
+    this.get_suppliers();
   },
 };
 </script>

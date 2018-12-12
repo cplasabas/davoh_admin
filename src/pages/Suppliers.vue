@@ -17,9 +17,6 @@
                   <v-form method="post" action="#" id="supplierForm" v-model="supplierFormValid">
                     <v-container grid-list-md>
                       <v-layout wrap>
-                        <v-flex xs6 sm6 md6>
-                          <v-text-field prefix="#" v-model="supplier.code" label="Code" hint="Code of Supplier" :rules="[rules.required]"></v-text-field>
-                        </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-text-field prepend-icon="perm_identity" v-model="supplier.name" label="Name" hint="Name" :rules="[rules.required]"></v-text-field>
                         </v-flex>
@@ -75,7 +72,6 @@
                 >
                 <template slot="items" slot-scope="props">
                   <td>{{ props.item.name }}</td>
-                  <td>{{ props.item.code }}</td>
                   <td>{{ props.item.email }}</td>
                   <td>{{ props.item.contact }}</td>
                   <td>{{ props.item.address }}</td>
@@ -180,10 +176,6 @@ export default {
             value: 'name'
           },
           {
-            text: 'Code',
-            value: 'code'
-          },
-          {
             text: 'Email',
             value: 'email'
           },
@@ -210,7 +202,6 @@ export default {
       },
       supplier: {
         name: '',
-        code: '',
         email: '',
         contact: '',
         address: ''
@@ -342,7 +333,6 @@ export default {
       };
 
       Api().get('supplier', config).then(response => {
-
         let suppliers = response.data.suppliers;
        
         this.suppliers.items = suppliers;
