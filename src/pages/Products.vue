@@ -29,16 +29,36 @@
                             @change="onFilePicked"
                           >
                         </v-flex>
-                        <v-flex xs6 sm6 md6>
+                        <v-flex xs3 sm3 md3>
                           <v-text-field prefix="#" v-model="product.code" label="Product Code" hint="*Code of the Product" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
-                        <v-flex xs6 sm6>
+                        <v-flex xs3 sm3>
                           <v-select
-                            prepend-icon="layers"
+                            prepend-icon="local_offer"
                             label="Category"
                             required
                             v-model="product.category_id"
                             :items="categories"
+                            :rules="[rules.required]"
+                          ></v-select>
+                        </v-flex>
+                        <v-flex xs3 sm3>
+                          <v-select
+                            prepend-icon="layers"
+                            label="Supplier"
+                            required
+                            v-model="product.supplier_id"
+                            :items="suppliers"
+                            :rules="[rules.required]"
+                          ></v-select>
+                        </v-flex>
+                        <v-flex xs3 sm3>
+                          <v-select
+                            prepend-icon="local_shipping"
+                            label="Shipment Code"
+                            required
+                            v-model="product.shipment_id"
+                            :items="shipments"
                             :rules="[rules.required]"
                           ></v-select>
                         </v-flex>
@@ -269,10 +289,14 @@ export default {
         show_add: false,
         show_delete: false
       },
+      suppliers: [],
+      shipments: [],
       product: {
         code: '',
         description: '',
         category_id: null,
+        shipment_id: null,
+        supplier_id: null,
         price: null
       },
       product_details: {
@@ -481,7 +505,39 @@ export default {
         this.dialog.show_add = false;
         window.getApp.$emit('PRODUCT_ADDED_FAIL');
       }
-    }
+    },
+    get_suppliers () {
+      let config = {
+        headers: { 'Authorization': this.$store.state.token }
+      };
+
+      Api().get('supplier', config).then(response => {
+
+        response.data.suppliers.map((val) => {
+          this.suppliers.push({
+            text: val.name,
+            value: val.id
+          });
+          return true;
+        });
+      });
+    },
+    get_shipments () {
+      let config = {
+        headers: { 'Authorization': this.$store.state.token }
+      };
+
+      Api().get('shipment', config).then(response => {
+
+        response.data.shipments.map((val) => {
+          this.shipments.push({
+            text: val.code,
+            value: val.id
+          });
+          return true;
+        });
+      });
+    },
   },
   // eslint-disable-next-line
   created: function () {
@@ -493,7 +549,8 @@ export default {
 
     this.get_products();
     this.get_categories();
-    
+    this.get_suppliers();
+    this.get_shipments();
   },
 };
 </script>

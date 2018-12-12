@@ -20,7 +20,7 @@
                         <v-flex xs4 sm4 md4>
                           <v-text-field prefix="#" v-model="shipment.code" label="Code" hint="Code of the Shipment" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
-                        <v-flex xs2 sm3 md3>
+                        <v-flex xs8 sm8 md8>
                           <v-select
                             prepend-icon="layers"
                             label="Supplier"
@@ -228,7 +228,8 @@ export default {
       date_menu: false,
       date: null,
       shipment: {
-        name: '',
+        code: null,
+        supplier_id: null,
         date: null
       },
       products: [],
