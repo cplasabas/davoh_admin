@@ -90,11 +90,6 @@
             :items="product_status"
           ></v-select>
         </v-flex>
-         <v-flex xs2 sm2>
-          <v-btn color="primary" @click="setPage()" dark slot="activator">
-            SET
-          </v-btn>
-        </v-flex>       
       </v-layout>
       <v-layout row wrap>
         <v-flex lg12>
@@ -123,6 +118,7 @@
                 :rows-per-page-items="[5]"
                 class="elevation-1"
                 item-key="name"             
+                :disable-page-reset="true"
                 >
                 <template slot="items" slot-scope="props">         
                   <td class="text-xs-center">
@@ -191,7 +187,11 @@ export default {
     return {
       search: '',
       categories: [],
-      pagination: {},
+      pagination: {
+        page: 1,
+        sortBy: 'Code',
+        descending: true
+      },
       original_products: [],
       products: {
         headers: [
@@ -313,13 +313,13 @@ export default {
       }
     }
   },
+  mounted () {
+    if (store.state.page) {
+      this.pagination.page = store.state.page;  
+      this.$store.dispatch('setPage', null);
+    }
+  },
   methods: {
-    setPage () {
-      if (store.state.page) {
-        this.pagination.page = store.state.page;  
-        this.$store.dispatch('setPage', null);
-      }
-    },
     formatAsCurrency (value, dec) {
       dec = dec || 0;
 
