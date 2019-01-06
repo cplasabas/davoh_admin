@@ -264,7 +264,11 @@ export default {
       };
 
       Api().get('product', config).then(response => {
-        let sales = response.data.products.filter(function (product) {
+        let sales = response.data.products;
+
+        this.original_sales = sales;
+
+        this.sales.items = this.original_sales.filter(function (product) {
           if (product.product_status.status === 'Sold') {
            
             let date = moment(product.product_status.sold_date);
@@ -280,8 +284,7 @@ export default {
           
         }.bind(this));
 
-        this.sales.items = sales;
-        this.original_sales = sales;
+
       });
     },
     get_expenses () {
@@ -298,7 +301,6 @@ export default {
           });  
         }
 
-        this.expenses.items = expenses;
         this.original_expenses = expenses;
 
         this.expenses.items = this.original_expenses.filter(function (expense) {

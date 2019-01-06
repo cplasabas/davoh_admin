@@ -177,6 +177,16 @@ export default [
       `@/pages/Users.vue`
     )
   },
+  {
+    path: '/Returns',
+    meta: { breadcrumb: true, requiresAuth: true, requiresAdmin: true },
+    name: 'Returns',
+    component: () => import(
+      /* webpackChunkName: "routes" */
+      /* webpackMode: "lazy-once" */
+      `@/pages/Returns.vue`
+    )
+  },
 
   // {
   //   path: '/calendar',

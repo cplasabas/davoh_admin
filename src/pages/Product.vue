@@ -15,6 +15,37 @@
                 Upload Image
                 <v-icon right dark>cloud_upload</v-icon>
               </v-btn>
+              <v-dialog v-model="dialog.show_return" scrollable @keydown.esc="dialog.show_return = false" persistent max-width="700px">
+                <v-btn color="primary" dark slot="activator">
+                  <v-icon dark>autorenew</v-icon>
+                </v-btn>
+                <v-card>
+                  <v-card-title>
+                    <span class="headline">Return Product</span>
+                  </v-card-title>
+                  <v-divider></v-divider>
+                  <v-card-text>
+                    <v-container grid-list-md>
+                      <p v-if="is_sold">Are you sure you want to return the sold product?</p>
+                      <p v-else>Are you sure you want to return the product to the supplier?</p>
+                    </v-container>
+                    <div class="text-xs-center">
+                      <div class="v-dialog__container" inset="true" style="display: inline-block;">
+                        <div class="v-dialog__activator">
+                          <button type="button" @click="return_product()" class="v-btn theme--dark red">
+                            <div class="v-btn__content">Return</div>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" flat @click="dialog.show_return = false">Close</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+
             </v-flex>
           </dd>
         </v-flex>     
@@ -675,6 +706,49 @@ export default {
     }
   },
   methods: {
+    async return_product () {
+      NProgress.start();
+      let config = {
+        headers: { 'Authorization': this.$store.state.token }
+      };
+      if (this.is_sold) {
+        let customer = this.original_customers.filter(function (customer) {
+          if (customer.id === this.product_status.customer_id) {
+            return customer;
+          }
+          return false;
+        }.bind(this));
+        
+        let sales_return = {
+          'product_code': this.product.code,
+          'client_name': customer[0].name
+        };
+
+        await Api().post('sales_returns', sales_return, config).then(response => {
+          this.product_status.status = 'On Hand';
+          this.update_product();
+        });
+      } else {
+        let supplier = this.original_suppliers.filter(function (supplier) {
+          if (supplier.id === this.product.supplier_id) {
+            return supplier;
+          }
+          return false;
+        }.bind(this));
+        
+
+        let purchase_return = {
+          'product_code': this.product.code,
+          'supplier_name': supplier[0].name
+        };
+        
+        await Api().post('purchase_returns', purchase_return, config).then(async response => {
+          await Api().delete('product/' + this.product.id, config).then(response => {
+            this.$router.push('/products');
+          });
+        });
+      }
+    },
     formatAsCurrency (value, dec) {
       dec = dec || 0;
 
@@ -783,7 +857,7 @@ export default {
         if (this.product_status.sold_date) {
           this.product_status.sold_date = moment(this.product_status.sold_date).format('MMMM D, YYYY');
         }
-        
+
         this.product = product;
 
         this.image_count = this.product.product_images.length;

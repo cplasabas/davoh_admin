@@ -77,7 +77,7 @@
                             v-model="product_details.gold_touch"
                             :items="gold_touches"
                             :rules="[rules.required]"
-                            suffix="ct"
+                            suffix="K"
                           ></v-select>
                         </v-flex>
                         <v-flex xs12 sm3 md3>
