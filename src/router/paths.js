@@ -57,16 +57,16 @@ export default [
       `@/pages/Login.vue`
     )
   },
-  {
-    path: '/dashboard',
-    meta: { breadcrumb: true, requiresAuth: true, requiresAdmin: true },
-    name: 'Dashboard',
-    component: () => import(
-      /* webpackChunkName: "routes" */
-      /* webpackMode: "lazy-once" */
-      `@/pages/Dashboard.vue`
-    )
-  },
+  // {
+  //   path: '/dashboard',
+  //   meta: { breadcrumb: true, requiresAuth: true, requiresAdmin: true },
+  //   name: 'Dashboard',
+  //   component: () => import(
+  //     /* webpackChunkName: "routes" */
+  //     /* webpackMode: "lazy-once" */
+  //     `@/pages/Dashboard.vue`
+  //   )
+  // },
   {
     path: '/products',
     meta: { breadcrumb: true, requiresAuth: true },

@@ -30,8 +30,10 @@
     "vue-quill-editor": "^3.0.6",
     "vue-resize": "^0.4.4",
     "vue-router": "^3.0.1",
-    "vuetify": "^1.1.0-alpha.6",
-    "vuex": "^3.0.1"
+    "vuetify": "^1.1.0-alpha.5",
+    "vuex": "^3.0.1",
+    "vuetify-daterange-picker": "^2.6.2",
+    "vuex-persistedstate": "^2.5.4"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

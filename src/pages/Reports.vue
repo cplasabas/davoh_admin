@@ -5,8 +5,23 @@
         <v-flex xs6 sm6 md6>
           <div class="headline grey--text text--darken-1">Report for the month of {{current_month}}</div>
         </v-flex>
+      </v-layout>
+      <v-layout row wrap>
+        <v-flex lg4>
+          <div class="headline grey--text text--darken-1 filter_text">Filter Date:</div>
+          <v-menu full-width offset-y :close-on-content-click="false" v-model="dateMenu" bottom>
+            <v-btn color="primary" outline slot="activator">{{ range[0] }} &mdash; {{ range[1] }}</v-btn>
+            <v-card>
+              <v-card-text>
+               <v-daterange :options="dateRangeOptions" :no-presets="true" @input="onDateRangeChange" />
+              </v-card-text>
+            </v-card>
+          </v-menu>
+        </v-flex>
+      </v-layout>
+      <v-layout row wrap>
         <v-flex lg12>
-          <v-flex xs12 sm12 md12>
+          <!-- <v-flex xs12 sm12 md12>
             <v-form method="post" action="#" id="prodcutForm" v-model="filterFormValid">
               <v-container grid-list-md>
                 <v-layout wrap>
@@ -22,20 +37,20 @@
                       full-width
                       :nudge-bottom="-22"
                       max-width="290px"
-                      :return-value.sync="start_date"
+                      :return-value.sync="range[0]"
                     >
                       <v-text-field
                         slot="activator"
                         label="Start Date"
-                        v-model="start_date"
+                        v-model="range[0]"
                         append-icon="event"
                         readonly
                         :rules="[rules.required]"
                       ></v-text-field>
-                      <v-date-picker v-model="start_date" no-title scrollable>
+                      <v-date-picker v-model="range[0]" no-title scrollable>
                         <v-spacer></v-spacer>
                         <v-btn flat color="primary" @click="start_date_menu = false">Cancel</v-btn>
-                        <v-btn flat color="primary" @click="$refs.startDate.save(start_date)">OK</v-btn>
+                        <v-btn flat color="primary" @click="$refs.startDate.save(range[0])">OK</v-btn>
                       </v-date-picker>
                     </v-menu>
                   </v-flex>
@@ -51,20 +66,20 @@
                       full-width
                       :nudge-bottom="-22"
                       max-width="290px"
-                      :return-value.sync="end_date"
+                      :return-value.sync="range[1]"
                     >
                       <v-text-field
                         slot="activator"
                         label="End Date"
-                        v-model="end_date"
+                        v-model="range[1]"
                         append-icon="event"
                         readonly
                         :rules="[rules.required]"
                       ></v-text-field>
-                      <v-date-picker v-model="end_date" no-title scrollable>
+                      <v-date-picker v-model="range[1]" no-title scrollable>
                         <v-spacer></v-spacer>
                         <v-btn flat color="primary" @click="end_date_menu = false">Cancel</v-btn>
-                        <v-btn flat color="primary" @click="$refs.endDate.save(end_date)">OK</v-btn>
+                        <v-btn flat color="primary" @click="$refs.endDate.save(range[1])">OK</v-btn>
                       </v-date-picker>
                     </v-menu>
                   </v-flex>
@@ -74,7 +89,7 @@
                 </v-layout>
               </v-container>
             </v-form>
-          </v-flex>
+          </v-flex> -->
           <v-card>
             <v-card-text>
               <v-container grid-list-md>
@@ -246,7 +261,21 @@ export default {
       isAdmin: false,
       rules: {
         required: value => !!value || 'Required.',
-      }
+      },
+      dateMenu: false,
+      range: [
+        moment()
+          .startOf('month')
+          .format('YYYY-MM-DD'),
+        moment().format('YYYY-MM-DD')
+      ],
+      dateRangeOptions: {
+        startDate: moment()
+          .startOf('month')
+          .format('YYYY-MM-DD'),
+        endDate: moment().format('YYYY-MM-DD'),
+        format: 'YYYY-MM-DD'
+      },
     };
   },
   watch: {
@@ -255,9 +284,15 @@ export default {
     },
     total_expenses () {
       this.get_totals();
-    }
+    },
+    range () {
+      this.filter_report();
+    },
   },
   methods: {
+    onDateRangeChange (range) {
+      this.range = range;
+    },
     get_products () {
       let config = {
         headers: { 'Authorization': this.$store.state.token }
@@ -273,7 +308,7 @@ export default {
            
             let date = moment(product.product_status.sold_date);
 
-            if (date.isBetween(this.start_date, this.end_date) || date.isSame(this.start_date) || date.isSame(this.end_date)) {
+            if (date.isBetween(this.range[0], this.range[1]) || date.isSame(this.range[0]) || date.isSame(this.range[1])) {
               this.gross_income = this.gross_income + product.product_status.selling_price;
               this.total_commission = this.total_commission + product.product_status.commission;
               return product;
@@ -307,7 +342,7 @@ export default {
   
           let date = moment(expense.date);
 
-          if (date.isBetween(this.start_date, this.end_date) || date.isSame(this.start_date) || date.isSame(this.end_date)) {
+          if (date.isBetween(this.range[0], this.range[1]) || date.isSame(this.range[0]) || date.isSame(this.range[1])) {
             this.total_expenses = this.total_expenses + expense.amount;
             return expense;
           }
@@ -328,7 +363,7 @@ export default {
       this.sales.items = this.original_sales.filter(function (sale) {
         let date = moment(sale.product_status.sold_date);
 
-        if (date.isBetween(this.start_date, this.end_date) || date.isSame(this.start_date) || date.isSame(this.end_date)) {
+        if (date.isBetween(this.range[0], this.range[1]) || date.isSame(this.range[0]) || date.isSame(this.range[1])) {
           this.gross_income = this.gross_income + sale.product_status.selling_price;
           this.total_commission = this.total_commission + sale.product_status.commission;
           return sale;
@@ -340,7 +375,7 @@ export default {
    
         let date = moment(expense.date);
 
-        if (date.isBetween(this.start_date, this.end_date) || date.isSame(this.start_date) || date.isSame(this.end_date)) {
+        if (date.isBetween(this.range[0], this.range[1]) || date.isSame(this.range[0]) || date.isSame(this.range[1])) {
           this.total_expenses = this.total_expenses + expense.amount;
           return expense;
         }
@@ -357,11 +392,18 @@ export default {
     }
 
     this.current_month = moment().format('MMMM');
-    this.start_date = moment().startOf('month').format('YYYY-MM-DD');
-    this.end_date = moment().endOf('month').format('YYYY-MM-DD');
+    this.range[0] = moment().startOf('month').format('YYYY-MM-DD');
+    this.range[1] = moment().endOf('month').format('YYYY-MM-DD');
 
     this.get_products();
     this.get_expenses();
   },
 };
 </script>
+
+<style scoped lang="css">
+.filter_text {
+  float: left;
+  margin-top: 0.5rem;
+}
+</style>

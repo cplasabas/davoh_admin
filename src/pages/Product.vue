@@ -420,7 +420,7 @@ export default {
         seller: null,
         selling_price: 0,
         customer_id: 0,
-        agent_id: 0,
+        agent_id: null,
         commission: 0,
         sold_date: 0,
         term_id: null,
@@ -607,7 +607,7 @@ export default {
           this.show_agent = true;
         } else {
           this.show_agent = false;
-          this.product_status.agent_id = 0;
+          this.product_status.agent_id = null;
         }
         
         this.commission_rate = commission_rate;
@@ -865,18 +865,29 @@ export default {
       });
     },
     async update_product () { 
-      try {
-        NProgress.start();
-        let config = {
-          headers: { 'Authorization': this.$store.state.token }
-        };
-       
-        await Api().put('product/' + this.$route.params.product_id, this.product, config).then(response => {
-          this.update_product_details();
-        });
-      } catch (error) { 
-        window.getApp.$emit('PRODUCT_UPDATE_FAIL');
+      let can_update = true;
+
+      if (this.product_status.status === 'Sold') {
+        if (this.product_status.customer_id === 0 || this.product_status.term_id === 0 || this.product_status.sold_date === null) {
+          can_update = false;
+        }
       }
+
+      if (can_update) {
+        try {
+          NProgress.start();
+          let config = {
+            headers: { 'Authorization': this.$store.state.token }
+          };
+        
+          await Api().put('product/' + this.$route.params.product_id, this.product, config).then(response => {
+            this.update_product_details();
+          });
+        } catch (error) { 
+          window.getApp.$emit('PRODUCT_UPDATE_FAIL');
+        }
+      }
+ 
     },
     async update_product_details () {
       try {

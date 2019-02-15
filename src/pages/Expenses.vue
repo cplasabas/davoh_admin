@@ -28,7 +28,7 @@
                         <v-flex xs12 sm4 lg4>
                           <v-text-field v-model="amountFormatted" label="Amount" value="00.00" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
-                        <v-flex xs12 sm4 md4 v-show="isAdmin">
+                        <v-flex xs12 sm4 md4>
                           <v-select
                             label="Type"
                             required

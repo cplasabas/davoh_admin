@@ -15,37 +15,21 @@ const router =  new Router({
 
 // router guards
 router.beforeEach((to, from, next) => {
-  NProgress.start();
-
-  if (to.meta.requiresAuth) {
-    if (!store.state.isUserLogged) {
-      next({
-        path: '/'
-      });
-      NProgress.done();
-    } else {
-      next();
-    } 
+  if (!to.name) {
+    next({
+      path: '/404'
+    });
+  } else if (to.meta.requiresAuth && !store.state.token) {
+    next({
+      path: '/403'
+    });
+  } else if (to.meta.requiresAdmin && store.state.user.type === 2) {
+    next({
+      path: '/403'
+    });
   } else {
     next();
   }
-
-  if (to.meta.requiresAdmin) {
-    if (store.state.user.level === 2) {
-      next({
-        path: '/products'
-      });
-      NProgress.done();
-    } else {
-      next();
-    } 
-  } else {
-    next();
-  }
-});
-
-router.afterEach((to, from) => {
-  NProgress.done();
 });
 
 export default router;

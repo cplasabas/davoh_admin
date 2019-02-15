@@ -1,10 +1,10 @@
 const menu = [
-  {
-    title: 'Dashboard',
-    group: 'default',
-    icon: 'dashboard',
-    name: 'Dashboard',
-  },
+  // {
+  //   title: 'Dashboard',
+  //   group: 'default',
+  //   icon: 'dashboard',
+  //   name: 'Dashboard',
+  // },
   {
     title: 'Products',
     group: 'default',

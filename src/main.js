@@ -12,7 +12,10 @@ import VueCloudinary from 'vue-cloudinary';
 import money from 'v-money';
 Vue.config.productionTip = false;
 import store from '@/store/store';
+import VDateRange from 'vuetify-daterange-picker';
+import 'vuetify-daterange-picker/dist/vuetify-daterange-picker.css';
 
+Vue.use(VDateRange);
 // Helpers
 // Global filters
 Vue.filter('truncate', Truncate);

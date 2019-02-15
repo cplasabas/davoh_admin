@@ -7,7 +7,7 @@ export default [
         color: 'green',
         text: 'Login successfully.'
       };
-      this.$router.push({ path: 'dashboard' });
+      // this.$router.push({ path: 'dashboard' });
     }
   },
   {

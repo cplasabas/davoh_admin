@@ -12,10 +12,8 @@
                 <v-alert v-show="error" type="error" :value="true">
                   {{ error }}
                 </v-alert>                
-                <v-form>
-                  <v-text-field prepend-icon="person" name="login" label="Login" type="text" v-model="username"></v-text-field>
-                  <v-text-field prepend-icon="lock" name="password" label="Password" id="password" type="password" v-model="password"></v-text-field>
-                </v-form>
+                <v-text-field prepend-icon="person" name="login" label="Login" type="text" v-model="username"></v-text-field>
+                <v-text-field prepend-icon="lock" @keyup.enter="login" name="password" label="Password" id="password" type="password" v-model="password"></v-text-field>
               </v-card-text>
               <v-card-actions>
                 <v-btn block color="primary" @click="login" @keyup.enter="login" :loading="loading">Login</v-btn>
@@ -48,7 +46,7 @@ export default {
           password: this.password
         }).then(response => {
           this.loading = false;
-          this.$router.push('/dashboard');
+          this.$router.push('/products');
           this.$store.dispatch('setToken', response.data.token);
           this.$store.dispatch('setUser', response.data.data);
           window.getApp.$emit('APP_LOGIN_SUCCESS');
