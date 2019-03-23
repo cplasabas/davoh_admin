@@ -46,9 +46,9 @@ export default {
           password: this.password
         }).then(response => {
           this.loading = false;
-          this.$router.push('/products');
           this.$store.dispatch('setToken', response.data.token);
           this.$store.dispatch('setUser', response.data.data);
+          this.$router.push('/products');
           window.getApp.$emit('APP_LOGIN_SUCCESS');
         });
       } catch (error) { 

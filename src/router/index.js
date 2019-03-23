@@ -19,11 +19,8 @@ router.beforeEach((to, from, next) => {
     next({
       path: '/404'
     });
-  } else if (to.meta.requiresAuth && !store.state.token) {
-    next({
-      path: '/403'
-    });
-  } else if (to.meta.requiresAdmin && store.state.user.type === 2) {
+  } else if ((to.meta.requiresAuth && !store.state.isUserLogged) || 
+    (to.meta.requiresAdmin && store.state.user.type === 2)) {
     next({
       path: '/403'
     });
