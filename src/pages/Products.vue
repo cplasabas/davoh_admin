@@ -81,7 +81,7 @@
                           ></v-select>
                         </v-flex>
                         <v-flex xs12 sm3 md3>
-                          <v-text-field type="number" v-if="isAdmin" v-model="product_details.diamond_weight" label="Diamond" hint="Diamond Weight" suffix="ct" clearable></v-text-field>
+                          <v-text-field type="number" v-model="product_details.diamond_weight" label="Diamond" hint="Diamond Weight" suffix="ct" clearable></v-text-field>
                         </v-flex>
                       <v-flex xs4 sm6 lg6>
                         <v-text-field v-model="priceFormatted" label="SRP" hint="*Selling Price" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
@@ -152,6 +152,7 @@
                   <td>{{ props.item.product_detail.gold_touch }}K</td>
                   <td>{{ props.item.product_detail.diamond_weight }}ct</td>
                   <td>{{ props.item.price | currency }}</td>
+                  <td>{{ props.item.product_status.selling_price | currency }}</td>
                   <td>{{ props.item.product_status.status}}</td>
                   <td class="text-xs-center">
                      <v-btn @click="view_product(props.item.id)" depressed outline icon fab dark color="green" small>
@@ -243,6 +244,10 @@ export default {
           {
             text: 'Price',
             value: 'price'
+          },
+          {
+            text: 'Selling Price',
+            value: 'product_status.selling_price'
           },
           {
             text: 'Status',

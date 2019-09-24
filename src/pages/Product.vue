@@ -118,7 +118,7 @@
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
-                      <v-text-field type="number" v-if="isAdmin" v-model="product_detail.diamond_weight" label="D Weight" hint="Diamond Weight" suffix="ct" :rules="[rules.required]" clearable></v-text-field>
+                      <v-text-field type="number" v-model="product_detail.diamond_weight" label="D Weight" hint="Diamond Weight" suffix="ct" :rules="[rules.required]" clearable></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2>
                       <v-text-field v-if="isAdmin" v-model="diamondWeightPriceFormatted" label="D Price" hint="Diamond Cost per Carat" prefix="$" clearable></v-text-field>
