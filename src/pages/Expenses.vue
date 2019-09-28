@@ -326,6 +326,16 @@ export default {
 
     },
     view_add (id) {
+      this.expense = {
+        or_number: '',
+        name: '',
+        description: '',
+        tin: '',
+        amount: 0,
+        type: null,
+        or_type: null,
+        date: null
+      }
 
       this.dialog.show_add = true;
       this.is_edit = false;
