@@ -19,14 +19,29 @@
                     <v-container grid-list-md>
                       <v-layout wrap>
                         <v-flex xs6 sm6 md6>
+                          <v-text-field v-model="expense.or_number" label="OR #" hint="OR Number" clearable></v-text-field>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <v-text-field v-model="expense.tin" label="TIN" hint="TIN" clearable></v-text-field>
+                        </v-flex>
+                      </v-layout>
+                      <v-layout wrap>
+                        <v-flex xs6 sm6 md6>
                           <v-text-field v-model="expense.name" label="Name" hint="Name" :rules="[rules.required]" clearable></v-text-field>
+                        </v-flex>
+                        <v-flex xs3 sm3 md3>
+                          <v-select
+                            label="VAT"
+                            v-model="expense.or_type"
+                            :items="or_type"
+                          ></v-select>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-textarea v-model="expense.description" label="Description" hint="Description" clearable
                           ></v-textarea>
                         </v-flex>
                         <v-flex xs12 sm4 lg4>
-                          <v-text-field v-model="amountFormatted" label="Amount" value="00.00" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
+                          <v-text-field v-model="amountFormatted" @blur="expenseInputActive = false" @focus="expenseInputActive = true" label="Amount" value="00.00" prefix="₱" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm4 md4>
                           <v-select
@@ -108,11 +123,14 @@
                 class="elevation-1"
                 item-key="name"
                 >
-                <template slot="items" slot-scope="props">             
+                <template slot="items" slot-scope="props">    
+                  <td>{{ props.item.or_number }}</td>         
                   <td>{{ props.item.name }}</td>
                   <td>{{ props.item.description}}</td>
+                  <td>{{ props.item.tin }}</td>
                   <td>{{ props.item.amount | currency }}</td>
                   <td>{{ props.item.date | moment("MMMM D, YYYY") }}</td>
+                  <td>{{ props.item.vat_text }}</td>
                   <td>{{ props.item.type_name }}</td>
                   <td class="text-xs-center">
                     <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
@@ -171,6 +189,10 @@ export default {
         selected: [],
         headers: [
           {
+            text: 'OR #',
+            value: 'or_number'
+          },
+          {
             text: 'Name',
             value: 'name',
           },
@@ -179,12 +201,20 @@ export default {
             value: 'description'
           },
           {
+            text: 'TIN',
+            value: 'tin',
+          },
+          {
             text: 'Amount',
             value: 'amount'
           },
           {
             text: 'Date',
             value: 'date'
+          },
+          {
+            text: 'VAT',
+            value: 'vat_text'
           },
           {
             text: 'Type',
@@ -216,6 +246,16 @@ export default {
           value: 3
         }
       ],
+      or_type: [
+        {
+          text: 'Non Vat',
+          value: 0
+        },
+        {
+          text: 'VAT',
+          value: 1
+        }
+      ],
       date_menu: false,
       date: null,
       dialog: { 
@@ -223,10 +263,13 @@ export default {
         show_delete: false
       },
       expense: {
+        or_number: '',
         name: '',
         description: '',
+        tin: '',
         amount: 0,
         type: null,
+        or_type: null,
         date: null
       },
       rules: {
@@ -236,28 +279,30 @@ export default {
       is_edit: false,
       delete_id: null,
       edit_id: null,
-      isAdmin: false
+      isAdmin: false,
+      expenseInputActive: false
     };
   },
   computed: {
     amountFormatted: {
       get: function () {
-        return this.formatAsCurrency(this.expense.amount, 0);
+        if (this.expenseInputActive) {
+          return this.expense.amount.toString();
+        } else {
+          return this.expense.amount.toFixed(2).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, '$1,');
+        }
       },
-      set: function (newValue) {
-        this.expense.amount = Number(newValue.replace(/[^0-9\.]/g, ''));
+      set: function (modifiedValue) {
+        let newValue = parseFloat(modifiedValue.replace(/[^\d\.]/g, ''));
+
+        if (isNaN(newValue)) {
+          newValue = 0;
+        }
+        this.expense.amount = newValue;
       }
     },
   },
-  methods: {
-    formatAsCurrency (value, dec) {
-      dec = dec || 0;
-
-      if (value === null) {
-        return 0;
-      }
-      return value.toFixed(dec).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
-    },
+  methods: {  
     view_delete (id) {
       this.delete_id = id;
       this.dialog.show_delete = true;
@@ -341,6 +386,14 @@ export default {
               response.data.expenses[key].type_name = 'Davoh Mumbai';
             } else if (response.data.expenses[key].type === 3) {
               response.data.expenses[key].type_name = 'Lotus Pharma';
+            }
+
+            if (response.data.expenses[key].or_type === 1) {
+              response.data.expenses[key].vat_text = 'VAT';
+            } else if (response.data.expenses[key].or_type === 0) {
+              response.data.expenses[key].vat_text = 'Non - VAT';
+            } else {
+              response.data.expenses[key].vat_text = 'N/A';
             }
           }
         }
