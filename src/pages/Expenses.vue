@@ -335,7 +335,7 @@ export default {
         type: null,
         or_type: null,
         date: null
-      }
+      };
 
       this.dialog.show_add = true;
       this.is_edit = false;
@@ -408,12 +408,6 @@ export default {
           }
         }
         let expenses = response.data.expenses;
-
-        if (!this.isAdmin) {
-          expenses = response.data.expenses.filter(function (expense) {
-            return expense.type === 1;
-          });  
-        }
         
         this.expenses.items = expenses;
       });
