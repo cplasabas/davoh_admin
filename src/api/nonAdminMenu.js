@@ -48,12 +48,6 @@ const menu = [
     name: 'Shipments',
   },
   {
-    title: 'Shipments',
-    group: 'default',
-    icon: 'local_shipping',
-    name: 'Shipments',
-  },
-  {
     title: 'Categories',
     group: 'default',
     icon: 'local_offer',

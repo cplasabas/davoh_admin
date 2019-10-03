@@ -2,94 +2,236 @@
   <div id="pageTable">
     <v-container grid-list-xl fluid>
       <v-layout row wrap>
-        <v-flex xs6 sm6 md6>
-          <div class="headline grey--text text--darken-1">Report for the month of {{current_month}}</div>
-        </v-flex>
-      </v-layout>
-      <v-layout row wrap>
         <v-flex lg4>
           <div class="headline grey--text text--darken-1 filter_text">Filter Date:</div>
           <v-menu full-width offset-y :close-on-content-click="false" v-model="dateMenu" bottom>
             <v-btn color="primary" outline slot="activator">{{ range[0] }} &mdash; {{ range[1] }}</v-btn>
             <v-card>
               <v-card-text>
-               <v-daterange :options="dateRangeOptions" :no-presets="true" @input="onDateRangeChange" />
+                <v-daterange :options="dateRangeOptions" :no-presets="true" @input="onDateRangeChange" />
               </v-card-text>
             </v-card>
           </v-menu>
         </v-flex>
       </v-layout>
       <v-layout row wrap>
-        <v-flex lg12>
-          <!-- <v-flex xs12 sm12 md12>
-            <v-form method="post" action="#" id="prodcutForm" v-model="filterFormValid">
-              <v-container grid-list-md>
-                <v-layout wrap>
-                  <v-flex xs12 sm2 lg2>
-                    <v-menu
-                      class="pr-2"
-                      ref="startDate"
-                      lazy
-                      :close-on-content-click="false"
-                      v-model="start_date_menu"
-                      transition="scale-transition"
-                      offset-y
-                      full-width
-                      :nudge-bottom="-22"
-                      max-width="290px"
-                      :return-value.sync="range[0]"
-                    >
-                      <v-text-field
-                        slot="activator"
-                        label="Start Date"
-                        v-model="range[0]"
-                        append-icon="event"
-                        readonly
-                        :rules="[rules.required]"
-                      ></v-text-field>
-                      <v-date-picker v-model="range[0]" no-title scrollable>
-                        <v-spacer></v-spacer>
-                        <v-btn flat color="primary" @click="start_date_menu = false">Cancel</v-btn>
-                        <v-btn flat color="primary" @click="$refs.startDate.save(range[0])">OK</v-btn>
-                      </v-date-picker>
-                    </v-menu>
-                  </v-flex>
-                  <v-flex xs12 sm2 lg2>
-                    <v-menu
-                      class="pr-2"
-                      ref="endDate"
-                      lazy
-                      :close-on-content-click="false"
-                      v-model="end_date_menu"
-                      transition="scale-transition"
-                      offset-y
-                      full-width
-                      :nudge-bottom="-22"
-                      max-width="290px"
-                      :return-value.sync="range[1]"
-                    >
-                      <v-text-field
-                        slot="activator"
-                        label="End Date"
-                        v-model="range[1]"
-                        append-icon="event"
-                        readonly
-                        :rules="[rules.required]"
-                      ></v-text-field>
-                      <v-date-picker v-model="range[1]" no-title scrollable>
-                        <v-spacer></v-spacer>
-                        <v-btn flat color="primary" @click="end_date_menu = false">Cancel</v-btn>
-                        <v-btn flat color="primary" @click="$refs.endDate.save(range[1])">OK</v-btn>
-                      </v-date-picker>
-                    </v-menu>
-                  </v-flex>
-                  <v-flex xs12 sm3 md3 lg3>
-                    <v-btn color="primary" flat @click="filter_report()" :disabled="!filterFormValid">Filter</v-btn>
-                  </v-flex>
-                </v-layout>
-              </v-container>
-            </v-form>
-          </v-flex> -->
+        <v-flex lg12 v-if="$store.state.user.level === 0">
+          <v-tabs v-model="selectedTab" color="grey lighten-3">
+            <v-tab ripple href="#tab-1">
+              Personal Report
+            </v-tab>
+            <v-tab ripple href="#tab-2">
+              General Report
+            </v-tab>
+            <v-tabs-items v-model="selectedTab">
+              <v-tab-item id="tab-1">
+                <v-card>
+                  <v-card-text>
+                    <v-container grid-list-md>
+                      <v-layout wrap>
+                        <v-flex xs6 sm6 md6>
+                          <div class="headline grey--text text--darken-1">Sales</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="headline green--text text--darken-1">{{gross_income | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12 >
+                          <v-data-table
+                            :headers="sales.personal_headers"
+                            :search="sales_search"
+                            :items="sales.items"
+                            :rows-per-page-items="[5]"
+                            class="elevation-1"
+                            item-key="name"              
+                            >
+                            <template slot="items" slot-scope="props">         
+                              <td>{{ props.item.code }}</td>
+                              <td class="text-xs-center">{{ props.item.product_detail.labor | currency }}</td>
+                              <td class="text-xs-center">{{ props.item.product_detail.manufacture_cost | currency }}</td>
+                              <td class="text-xs-center">{{ props.item.product_status.seller}}</td>
+                              <td class="text-xs-center">{{ moment(props.item.product_status.sold_date).format('MMMM DD, YYYY')}}</td>
+                              <td class="text-xs-center">{{ props.item.product_status.commission | currency }}</td>
+                              <td class="text-xs-right">{{ props.item.product_status.selling_price | currency }}</td>
+                            </template>
+                          </v-data-table>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="headline grey--text text--darken-1">Expenses</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="headline red--text text--darken-1">{{total_expenses_personal | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12 >
+                          <v-data-table
+                            :headers="expenses.headers"
+                            :search="expense_search"
+                            :items="expenses.items"
+                            :rows-per-page-items="[5]"
+                            class="elevation-1"
+                            item-key="name"              
+                            >
+                            <template slot="items" slot-scope="props">         
+                              <td>{{ props.item.name }}</td>
+                              <td>{{ props.item.type_text }}</td>
+                              <td class="text-xs-center">{{ moment(props.item.date).format('MMMM DD, YYYY')}}</td>
+                              <td class="text-xs-right">{{ props.item.amount | currency }}</td>
+                            </template>
+                          </v-data-table>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="title grey--text text--darken-1">Gross Income</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="title grey--text text--darken-1">{{gross_income | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="title grey--text text--darken-1">Expenses</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="title red--text text--darken-1">- {{total_expenses_personal | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="title grey--text text--darken-1">Manufacturing Cost</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="title red--text text--darken-1">- {{total_manufacturing | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="title grey--text text--darken-1">Labor</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="title red--text text--darken-1">- {{total_labor | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="title grey--text text--darken-1">Commission</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="title red--text text--darken-1">- {{total_commission | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="title grey--text text--darken-1">Net Income</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="title green--text text--darken-1">{{net_income_personal | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                      </v-layout>
+                    </v-container>
+                  </v-card-text>
+                </v-card>
+              </v-tab-item>
+              <v-tab-item id="tab-2">
+                <v-card>
+                  <v-card-text>
+                    <v-container grid-list-md>
+                      <v-layout wrap>
+                        <v-flex xs6 sm6 md6>
+                          <div class="headline grey--text text--darken-1">Sales</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="headline green--text text--darken-1">{{gross_income | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12 >
+                          <v-data-table
+                            :headers="sales.general_headers"
+                            :search="sales_search"
+                            :items="sales.items"
+                            :rows-per-page-items="[5]"
+                            class="elevation-1"
+                            item-key="name"              
+                            >
+                            <template slot="items" slot-scope="props">         
+                              <td>{{ props.item.code }}</td>
+                              <td class="text-xs-center">{{ props.item.product_status.seller}}</td>
+                              <td class="text-xs-center">{{ moment(props.item.product_status.sold_date).format('MMMM DD, YYYY')}}</td>
+                              <td class="text-xs-center">{{ props.item.product_status.commission | currency }}</td>
+                              <td class="text-xs-right">{{ props.item.product_status.selling_price | currency }}</td>
+                            </template>
+                          </v-data-table>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="headline grey--text text--darken-1">Expenses</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="headline red--text text--darken-1">{{total_expenses | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12 >
+                          <v-data-table
+                            :headers="expenses.headers"
+                            :search="expense_search"
+                            :items="general_expenses"
+                            :rows-per-page-items="[5]"
+                            class="elevation-1"
+                            item-key="name"              
+                            >
+                            <template slot="items" slot-scope="props">         
+                              <td>{{ props.item.name }}</td>
+                              <td>{{ props.item.type_text }}</td>
+                              <td class="text-xs-center">{{ moment(props.item.date).format('MMMM DD, YYYY')}}</td>
+                              <td class="text-xs-right">{{ props.item.amount | currency }}</td>
+                            </template>
+                          </v-data-table>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="title grey--text text--darken-1">Gross Income</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="title grey--text text--darken-1">{{gross_income | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="title grey--text text--darken-1">Expenses</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="title red--text text--darken-1">- {{total_expenses | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="title grey--text text--darken-1">Commission</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="title red--text text--darken-1">- {{total_commission | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6>
+                          <div class="title grey--text text--darken-1">Net Income</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                        <v-flex xs6 sm6 md6 class="text-xs-right">
+                          <div class="title green--text text--darken-1">{{net_income | currency}}</div>
+                          <v-divider></v-divider>
+                        </v-flex>
+                      </v-layout>
+                    </v-container>
+                  </v-card-text>
+                </v-card>
+              </v-tab-item>              
+            </v-tabs-items>
+          </v-tabs>
+        </v-flex>  
+        <v-flex lg12 v-else>
           <v-card>
             <v-card-text>
               <v-container grid-list-md>
@@ -104,8 +246,8 @@
                   </v-flex>
                   <v-flex xs12 sm12 md12 >
                     <v-data-table
-                      :headers="sales.headers"
-                      :search="search"
+                      :headers="sales.general_headers"
+                      :search="sales_search"
                       :items="sales.items"
                       :rows-per-page-items="[5]"
                       class="elevation-1"
@@ -131,56 +273,57 @@
                   <v-flex xs12 sm12 md12 >
                     <v-data-table
                       :headers="expenses.headers"
-                      :search="search"
-                      :items="expenses.items"
+                      :search="expense_search"
+                      :items="general_expenses"
                       :rows-per-page-items="[5]"
                       class="elevation-1"
                       item-key="name"              
                       >
                       <template slot="items" slot-scope="props">         
                         <td>{{ props.item.name }}</td>
+                        <td>{{ props.item.type_text }}</td>
                         <td class="text-xs-center">{{ moment(props.item.date).format('MMMM DD, YYYY')}}</td>
                         <td class="text-xs-right">{{ props.item.amount | currency }}</td>
                       </template>
                     </v-data-table>
                   </v-flex>
                   <v-flex xs6 sm6 md6>
-                    <div class="display-1 grey--text text--darken-1">Gross Income</div>
+                    <div class="title grey--text text--darken-1">Gross Income</div>
                     <v-divider></v-divider>
                   </v-flex>
                   <v-flex xs6 sm6 md6 class="text-xs-right">
-                    <div class="display-1 grey--text text--darken-1">{{gross_income | currency}}</div>
+                    <div class="title grey--text text--darken-1">{{gross_income | currency}}</div>
                     <v-divider></v-divider>
                   </v-flex>
                   <v-flex xs6 sm6 md6>
-                    <div class="display-1 grey--text text--darken-1">Expenses</div>
+                    <div class="title grey--text text--darken-1">Expenses</div>
                     <v-divider></v-divider>
                   </v-flex>
                   <v-flex xs6 sm6 md6 class="text-xs-right">
-                    <div class="display-1 red--text text--darken-1">- {{total_expenses | currency}}</div>
+                    <div class="title red--text text--darken-1">- {{total_expenses | currency}}</div>
                     <v-divider></v-divider>
                   </v-flex>
                   <v-flex xs6 sm6 md6>
-                    <div class="display-1 grey--text text--darken-1">Commission</div>
+                    <div class="title grey--text text--darken-1">Commission</div>
                     <v-divider></v-divider>
                   </v-flex>
                   <v-flex xs6 sm6 md6 class="text-xs-right">
-                    <div class="display-1 red--text text--darken-1">- {{total_commission | currency}}</div>
+                    <div class="title red--text text--darken-1">- {{total_commission | currency}}</div>
                     <v-divider></v-divider>
                   </v-flex>
                   <v-flex xs6 sm6 md6>
-                    <div class="display-1 grey--text text--darken-1">Net Income</div>
+                    <div class="title grey--text text--darken-1">Net Income</div>
                     <v-divider></v-divider>
                   </v-flex>
                   <v-flex xs6 sm6 md6 class="text-xs-right">
-                    <div class="display-1 green--text text--darken-1">{{net_income | currency}}</div>
+                    <div class="title green--text text--darken-1">{{net_income | currency}}</div>
                     <v-divider></v-divider>
                   </v-flex>
                 </v-layout>
               </v-container>
             </v-card-text>
           </v-card>
-        </v-flex>  
+        </v-flex>
       </v-layout>
     </v-container>
   </div>
@@ -188,20 +331,52 @@
 
 <script>
 import Api from '@/api/api';
-import store from '@/store/store';
+
 import moment from 'moment';
 
 export default {
   data () {
     return {
       moment: moment,
-      search: '',
-      original_sales: [],
-      original_expenses: [],
-      current_month: '',
+      selectedTab: null,
+      sales_search: '',
+      expense_search: '',
       sales: {
-        selected: [],
-        headers: [
+        personal_headers: [
+          {
+            text: 'Code',
+            value: 'code',
+          },
+          {
+            text: 'Labor',
+            value: 'product_detail.labor',
+          },
+          {
+            text: 'Manufacturing Cost',
+            value: 'product_detail.manufacture_cost',
+          },
+          {
+            text: 'Client',
+            value: 'client',
+            align: 'center'
+          },
+          {
+            text: 'Sold Date',
+            value: 'date',
+            align: 'center'
+          },
+          {
+            text: 'Commission',
+            value: 'commission',
+            align: 'center'
+          },
+          {
+            text: 'Amount',
+            value: 'amount',
+            align: 'right'
+          },
+        ],
+        general_headers: [
           {
             text: 'Code',
             value: 'code',
@@ -230,11 +405,14 @@ export default {
         items: []
       },
       expenses: {
-        selected: [],
         headers: [
           {
             text: 'Name',
             value: 'name',
+          },
+          {
+            text: 'Type',
+            value: 'type_text',
           },
           {
             text: 'Date',
@@ -249,77 +427,70 @@ export default {
         ],
         items: []
       },
-      total_expenses: 0,
-      total_commission: 0,
-      gross_income: 0,
-      net_income: 0,
-      start_date: null,
-      start_date_menu: false,
-      end_date: null,
-      end_date_menu: false,
-      filterFormValid: false,
-      isAdmin: false,
-      rules: {
-        required: value => !!value || 'Required.',
-      },
       dateMenu: false,
       range: [
-        moment()
-          .startOf('month')
-          .format('YYYY-MM-DD'),
+        moment().startOf('month').format('YYYY-MM-DD'),
         moment().format('YYYY-MM-DD')
       ],
       dateRangeOptions: {
-        startDate: moment()
-          .startOf('month')
-          .format('YYYY-MM-DD'),
+        startDate: moment().startOf('month').format('YYYY-MM-DD'),
         endDate: moment().format('YYYY-MM-DD'),
         format: 'YYYY-MM-DD'
-      },
+      }
     };
   },
-  watch: {
-    gross_income () {
-      this.get_totals();
+  computed: {
+    gross_income: function () {
+      return this.sales.items.reduce((a, b) => a + b.product_status.selling_price, 0);
     },
-    total_expenses () {
-      this.get_totals();
+    total_expenses_personal: function () {
+      return this.expenses.items.reduce((a, b) => a + b.amount, 0);
     },
-    range () {
-      this.filter_report();
+    total_commission: function () {
+      return this.sales.items.reduce((a, b) => a + b.product_status.commission, 0);
     },
+    total_manufacturing: function () {
+      return this.sales.items.reduce((a, b) => a + b.product_detail.manufacture_cost, 0);
+    },
+    total_labor: function () {
+      return this.sales.items.reduce((a, b) => a + b.product_detail.labor, 0);
+    },
+    net_income_personal: function () {
+      return this.gross_income - (this.total_expenses_personal + this.total_commission + this.total_manufacturing + this.total_labor);
+    },
+    total_expenses: function () {
+      return this.expenses.items.reduce((a, b) => {
+        if (b.type !== 0) {
+          return a + b.amount;
+        }
+
+        return a + 0;
+      }, 0);
+    },
+    net_income: function () {
+      return this.gross_income - (this.total_expenses + this.total_commission);
+    },
+    general_expenses: function () {
+      return this.expenses.items.filter(expense => expense.type !== 0);
+    }
+  },
+  created: function () {
+    this.get_sales();
   },
   methods: {
     onDateRangeChange (range) {
       this.range = range;
+      this.get_sales();
     },
-    get_products () {
+    get_sales () {
       let config = {
         headers: { 'Authorization': this.$store.state.token }
       };
 
-      Api().get('product', config).then(response => {
-        let sales = response.data.products;
+      Api().get(`sales?start_date=${this.range[0]}&end_date=${this.range[1]}`, config).then(response => {
+        this.sales.items = response.data.sales;
 
-        this.original_sales = sales;
-
-        this.sales.items = this.original_sales.filter(function (product) {
-          if (product.product_status.status === 'Sold') {
-           
-            let date = moment(product.product_status.sold_date);
-
-            if (date.isBetween(this.range[0], this.range[1]) || date.isSame(this.range[0]) || date.isSame(this.range[1])) {
-              this.gross_income = this.gross_income + product.product_status.selling_price;
-              this.total_commission = this.total_commission + product.product_status.commission;
-              return product;
-            }
-          }
-
-          return false;
-          
-        }.bind(this));
-
-
+        this.get_expenses();
       });
     },
     get_expenses () {
@@ -327,77 +498,33 @@ export default {
         headers: { 'Authorization': this.$store.state.token }
       };
 
-      Api().get('expense', config).then(response => {
-        let expenses = response.data.expenses;
+      Api().get(`expense?start_date=${this.range[0]}&end_date=${this.range[1]}`, config).then(response => {
+        this.expenses.items = response.data.expenses;
 
-        if (!this.isAdmin) {
-          expenses = response.data.expenses.filter(function (expense) {
-            return expense.type === 1;
-          });  
-        }
-
-        this.original_expenses = expenses;
-
-        this.expenses.items = this.original_expenses.filter(function (expense) {
-  
-          let date = moment(expense.date);
-
-          if (date.isBetween(this.range[0], this.range[1]) || date.isSame(this.range[0]) || date.isSame(this.range[1])) {
-            this.total_expenses = this.total_expenses + expense.amount;
-            return expense;
+        this.expenses.items.map(expense => {
+          
+          if (expense.type === 0) {
+            expense.type_text = 'Personal';
           }
-          return false;
-        }.bind(this));
 
-      });
-    },
-    get_totals () {
-      this.net_income = this.gross_income - (this.total_expenses + this.total_commission);
-    },
-    filter_report () {
+          if (expense.type === 1) {
+            expense.type_text = 'Davoh PH';
+          }
 
-      this.gross_income = 0;
-      this.total_commission = 0;
-      this.total_expenses = 0;
+          if (expense.type === 2) {
+            expense.type_text = 'Davoh Mumbai';
+          }
 
-      this.sales.items = this.original_sales.filter(function (sale) {
-        let date = moment(sale.product_status.sold_date);
+          if (expense.type === 3) {
+            expense.type_text = 'Lotus Pharma';
+          }
 
-        if (date.isBetween(this.range[0], this.range[1]) || date.isSame(this.range[0]) || date.isSame(this.range[1])) {
-          this.gross_income = this.gross_income + sale.product_status.selling_price;
-          this.total_commission = this.total_commission + sale.product_status.commission;
-          return sale;
-        }
-        return false;
-      }.bind(this));
-
-      this.expenses.items = this.original_expenses.filter(function (expense) {
-   
-        let date = moment(expense.date);
-
-        if (date.isBetween(this.range[0], this.range[1]) || date.isSame(this.range[0]) || date.isSame(this.range[1])) {
-          this.total_expenses = this.total_expenses + expense.amount;
           return expense;
-        }
-        return false;
-      }.bind(this));
-    },
-  },
-  // eslint-disable-next-line
-  created: function () {
-    if (store.state.user.level === 0) {
-      this.isAdmin = true;
-    } else {
-      this.isAdmin = false;
+        });
+      });
     }
+  }
 
-    this.current_month = moment().format('MMMM');
-    this.range[0] = moment().startOf('month').format('YYYY-MM-DD');
-    this.range[1] = moment().endOf('month').format('YYYY-MM-DD');
-
-    this.get_products();
-    this.get_expenses();
-  },
 };
 </script>
 
