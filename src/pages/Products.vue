@@ -141,27 +141,26 @@
                 :disable-page-reset="true"
                 >
                 <template slot="items" slot-scope="props">         
-                  <td class="text-xs-center">
-                    <v-avatar size="32">
-                      <img :src="props.item.image_url" alt="">
-                    </v-avatar> 
-                  </td>
-                  <td>{{ props.item.code }}</td>
-                  <td>{{ props.item.category.name}}</td>
-                  <td>{{ props.item.product_detail.gold_weight }}mg</td>
-                  <td>{{ props.item.product_detail.gold_touch }}K</td>
-                  <td>{{ props.item.product_detail.diamond_weight }}ct</td>
-                  <td>{{ props.item.price | currency }}</td>
-                  <td>{{ props.item.product_status.selling_price | currency }}</td>
-                  <td>{{ props.item.product_status.status}}</td>
-                  <td class="text-xs-center">
-                     <v-btn @click="view_product(props.item.id)" depressed outline icon fab dark color="green" small>
-                      <v-icon>remove_red_eye</v-icon>
-                    </v-btn>
-                    <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
-                      <v-icon>delete</v-icon>
-                    </v-btn>
-                  </td>
+                  <tr style="cursor: pointer" @click="view_product(props.item.id)">
+                    <td class="text-xs-center">
+                      <v-avatar size="32">
+                        <img :src="props.item.image_url" alt="">
+                      </v-avatar> 
+                    </td>
+                    <td>{{ props.item.code }}</td>
+                    <td>{{ props.item.category.name}}</td>
+                    <td>{{ props.item.product_detail.gold_weight }}mg</td>
+                    <td>{{ props.item.product_detail.gold_touch }}K</td>
+                    <td>{{ props.item.product_detail.diamond_weight }}ct</td>
+                    <td>{{ props.item.price | currency }}</td>
+                    <td>{{ props.item.product_status.selling_price | currency }}</td>
+                    <td>{{ props.item.product_status.status}}</td>
+                    <td class="text-xs-center">
+                      <v-btn @click="view_delete(props.item.id)" depressed outline icon fab dark color="pink" slot="activator" small>
+                        <v-icon>delete</v-icon>
+                      </v-btn>
+                    </td>
+                  </tr>
                 </template>
               </v-data-table>
             </v-card-text>
@@ -559,3 +558,9 @@ export default {
   },
 };
 </script>
+
+<style lang="css" scoped>
+  .clickable {
+    cursor: pointer;
+  }
+</style>

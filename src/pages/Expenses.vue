@@ -26,7 +26,7 @@
                         </v-flex>
                       </v-layout>
                       <v-layout wrap>
-                        <v-flex xs6 sm6 md6>
+                        <v-flex xs5 sm5 md5>
                           <v-text-field v-model="expense.name" label="Name" hint="Name" :rules="[rules.required]" clearable></v-text-field>
                         </v-flex>
                         <v-flex xs3 sm3 md3>
@@ -34,6 +34,13 @@
                             label="VAT"
                             v-model="expense.or_type"
                             :items="or_type"
+                          ></v-select>
+                        </v-flex>
+                        <v-flex xs4 sm4 md4>
+                          <v-select
+                            label="Mode Of Payment"
+                            v-model="expense.payment_type"
+                            :items="payment_type"
                           ></v-select>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
@@ -45,7 +52,7 @@
                         </v-flex>
                         <v-flex xs12 sm4 md4>
                           <v-select
-                            label="Type"
+                            label="Company"
                             required
                             v-model="expense.type"
                             :items="type"
@@ -124,14 +131,15 @@
                 item-key="name"
                 >
                 <template slot="items" slot-scope="props">    
-                  <td>{{ props.item.or_number }}</td>         
-                  <td>{{ props.item.name }}</td>
-                  <td>{{ props.item.description}}</td>
-                  <td>{{ props.item.tin }}</td>
-                  <td>{{ props.item.amount | currency }}</td>
                   <td>{{ props.item.date | moment("MMMM D, YYYY") }}</td>
+                  <td>{{ get_type_text(props.item.type) }}</td>
+                  <td>{{ props.item.name}}</td>
+                  <td>{{ props.item.description}}</td>
+                  <td>{{ get_payment_text(props.item.payment_type) }}</td>
                   <td>{{ props.item.vat_text }}</td>
-                  <td>{{ props.item.type_name }}</td>
+                  <td>{{ props.item.tin }}</td>
+                  <td>{{ props.item.or_number }}</td>  
+                  <td>{{ props.item.amount | currency }}</td>
                   <td class="text-xs-center">
                     <v-btn @click="view_edit(props.item.id)" depressed outline icon fab dark color="green" small>
                       <v-icon>create</v-icon>
@@ -189,8 +197,12 @@ export default {
         selected: [],
         headers: [
           {
-            text: 'OR #',
-            value: 'or_number'
+            text: 'Date',
+            value: 'date'
+          },
+          {
+            text: 'Company',
+            value: 'company'
           },
           {
             text: 'Name',
@@ -201,24 +213,24 @@ export default {
             value: 'description'
           },
           {
-            text: 'TIN',
-            value: 'tin',
-          },
-          {
-            text: 'Amount',
-            value: 'amount'
-          },
-          {
-            text: 'Date',
-            value: 'date'
-          },
+            text: 'Mode of Payment',
+            value: 'payment_type'
+          },  
           {
             text: 'VAT',
             value: 'vat_text'
           },
           {
-            text: 'Type',
-            value: 'type_name'
+            text: 'TIN',
+            value: 'tin',
+          },
+          {
+            text: 'OR #',
+            value: 'or_number'
+          },
+          {
+            text: 'Amount',
+            value: 'amount'
           },
           {
             text: 'Actions',
@@ -234,16 +246,12 @@ export default {
           value: 0
         },
         {
-          text: 'Davoh PH',
+          text: 'Davoh',
           value: 1
         },
         {
-          text: 'Davoh Mumbai',
+          text: 'Lotus',
           value: 2
-        },
-        {
-          text: 'Lotus Pharma',
-          value: 3
         }
       ],
       or_type: [
@@ -254,6 +262,20 @@ export default {
         {
           text: 'VAT',
           value: 1
+        }
+      ],
+      payment_type: [
+        {
+          text: 'Cash',
+          value: 0
+        },
+        {
+          text: 'Cheque',
+          value: 1
+        },
+        {
+          text: 'Credit Card',
+          value: 2
         }
       ],
       date_menu: false,
@@ -270,6 +292,7 @@ export default {
         amount: 0,
         type: null,
         or_type: null,
+        payment_type: null,
         date: null
       },
       rules: {
@@ -303,6 +326,16 @@ export default {
     },
   },
   methods: {  
+    get_type_text (id) {
+      let type = this.type.find(type => type.value === id);
+      
+      return (typeof type !== 'undefined') ? type.text : 'No Company';
+    },
+    get_payment_text (id) {
+      let type = this.payment_type.find(type => type.value === id);
+      
+      return (typeof type !== 'undefined') ? type.text : 'No Mode Payment';
+    },
     view_delete (id) {
       this.delete_id = id;
       this.dialog.show_delete = true;
@@ -334,6 +367,7 @@ export default {
         amount: 0,
         type: null,
         or_type: null,
+        payment_type: null,
         date: null
       };
 
@@ -388,16 +422,6 @@ export default {
       Api().get('expense', config).then(response => {
         for (let key in response.data.expenses) {
           if (response.data.expenses.hasOwnProperty(key)) {
-            if (response.data.expenses[key].type === 0) {
-              response.data.expenses[key].type_name = 'Personal';
-            } else if (response.data.expenses[key].type === 1) {
-              response.data.expenses[key].type_name = 'Davoh PH';
-            } else if (response.data.expenses[key].type === 2) {
-              response.data.expenses[key].type_name = 'Davoh Mumbai';
-            } else if (response.data.expenses[key].type === 3) {
-              response.data.expenses[key].type_name = 'Lotus Pharma';
-            }
-
             if (response.data.expenses[key].or_type === 1) {
               response.data.expenses[key].vat_text = 'VAT';
             } else if (response.data.expenses[key].or_type === 0) {

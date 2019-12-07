@@ -184,6 +184,14 @@
                     </v-flex>
                     <v-flex xs3 sm3 md3 v-show="is_sold">
                       <v-select
+                        label="Mode of Payment"
+                        required
+                        v-model="product_status.payment_type"
+                        :items="payment_mode"
+                      ></v-select>
+                    </v-flex>
+                    <v-flex xs3 sm3 md3 v-show="is_sold">
+                      <v-select
                         label="Payment Type"
                         required
                         v-model="product_status.type"
@@ -211,8 +219,8 @@
                     <v-flex xs12 sm3 md3 v-show="is_sold">
                       <v-text-field v-model="soldPriceFormatted" label="Sold Price" hint="Sold Price" prefix="₱"></v-text-field>
                     </v-flex>
-                     <v-flex xs12 sm1 md1 v-show="is_sold">
-                      <v-text-field type="number" v-model="commission_rate" label="Rate" hint="Rate" suffix="%" readonly></v-text-field>
+                    <v-flex xs12 sm1 md1 v-show="is_sold">
+                      <v-text-field type="number" v-model="product_status.commission_rate" label="Rate" hint="Rate" suffix="%"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm3 md3 v-show="is_sold">
                       <v-text-field v-model="commissionFormatted" label="Commission" hint="Commission" prefix="₱" readonly></v-text-field>
@@ -383,6 +391,20 @@ export default {
           value: 18
         }
       ],
+      payment_mode: [
+        {
+          text: 'Cash',
+          value: 0
+        },
+        {
+          text: 'Cheque',
+          value: 1
+        },
+        {
+          text: 'Credit Card',
+          value: 2
+        }
+      ],
       original_categories: [],
       categories: [],
       original_terms: [],
@@ -424,6 +446,8 @@ export default {
         commission: 0,
         sold_date: 0,
         term_id: null,
+        payment_type: null,
+        commission_rate: 0,
         paid: null,
       },
       sold_date_menu: false,
@@ -440,7 +464,6 @@ export default {
       is_term: false,
       isAdmin: false,
       due_date: null,
-      commission_rate: 0,
       commission: 0,
       balance: 0,
       interest: 0,
@@ -562,6 +585,9 @@ export default {
     },
     payment_type () {
       return this.product_status.type;
+    },
+    commission_rate () {
+      return this.product_status.commission_rate;
     }
   },
   watch: {
@@ -582,38 +608,24 @@ export default {
     sold_date () {
       this.product_status.sold_date = moment(this.sold_date).format('MMMM D, YYYY');
     },
-    product_category () {
+    commission_rate () {
       setTimeout(function () {
-        let category = this.original_categories.filter(u => u.id === this.product.category_id);
-        
-        let commission_rate = category[0].commission_rate;
-
-        if (this.product_status.type === 1) {
-          commission_rate *= 2;
-        } 
-        
-        this.commission_rate = commission_rate;
-
+        if (this.product_status.selling_price) {
+          this.product_status.commission = this.product_status.selling_price * (this.product_status.commission_rate / 100);
+        }
       }.bind(this), 100);
     },
     payment_type () {
       setTimeout(function () {
-        let category = this.original_categories.filter(u => u.id === this.product.category_id);
-          
-        let commission_rate = category[0].commission_rate;
-
         if (this.product_status.type === 1) {
-          commission_rate *= 2;
           this.show_agent = true;
         } else {
           this.show_agent = false;
           this.product_status.agent_id = null;
         }
-        
-        this.commission_rate = commission_rate;
 
-        if (this.commission_rate && this.product_status.selling_price) {
-          this.product_status.commission = this.product_status.selling_price * (this.commission_rate / 100);
+        if (this.product_status.selling_price) {
+          this.product_status.commission = this.product_status.selling_price * (this.product_status.commission_rate / 100);
           
           let term = this.original_terms.filter(u => u.id === this.product_status.term_id);
 
@@ -637,21 +649,23 @@ export default {
       this.product_detail.diamond_cost = this.product_detail.diamond_weight * this.product_detail.diamond_weight_price;
     },
     product_price () {
-      if (this.commission_rate && this.product_status.selling_price) {
-        this.product_status.commission = this.product_status.selling_price * (this.commission_rate / 100);
+      if (this.product_status.selling_price) {
+        this.product_status.commission = this.product_status.selling_price * (this.product_status.commission_rate / 100);
         
-        let term = this.original_terms.filter(u => u.id === this.product_status.term_id);
+        let term = this.original_terms.find(u => u.id === this.product_status.term_id);
 
-        let days = term[0].days;
+        if (typeof term !== 'undefined') {
+          let days = term[0].days;
 
-        let payment_amount = this.product_status.selling_price / days;
-        
-        if (term[0].interest) {
-          let interest_amount = payment_amount * (term[0].interest / 100);
-          payment_amount += interest_amount;
+          let payment_amount = this.product_status.selling_price / days;
+          
+          if (term[0].interest) {
+            let interest_amount = payment_amount * (term[0].interest / 100);
+            payment_amount += interest_amount;
+          }
+
+          this.payment_amount = this.formatAsCurrency(payment_amount, 0);
         }
-
-        this.payment_amount = this.formatAsCurrency(payment_amount, 0);
       }
     },
     payment_status () {
